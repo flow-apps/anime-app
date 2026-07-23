@@ -1,16 +1,16 @@
-import FastTranslator from "fast-mlkit-translate-text";
+import FastTranslator, { Languages } from "fast-mlkit-translate-text";
 import { useCallback, useEffect } from "react";
 
-export function useTranslateText() {
+export function useTranslateText(source?: Languages, target?: Languages) {
   useEffect(() => {
     (async () => {
       await FastTranslator.prepare({
-        source: "English",
-        target: "Portuguese",
+        source: source || "English",
+        target: target || "Portuguese",
         downloadIfNeeded: true,
       });
     })();
-  }, [FastTranslator]);
+  }, [FastTranslator, source, target]);
 
   const translateText = useCallback(
     async (text: string) => {

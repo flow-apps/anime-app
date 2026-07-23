@@ -50,7 +50,7 @@ const HomeScreen: React.FC = () => {
   if (loading) return <Loading />;
 
   return (
-    <Container>
+    <Container padding={15}>
       <HomeSlider
         onPress={(index: number) => {
           router.navigate({

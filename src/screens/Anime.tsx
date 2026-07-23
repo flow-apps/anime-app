@@ -43,7 +43,9 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
               name: await translateText(genre.name),
             })),
           );
-          animeData.synopsis = await translateText(animeData.synopsis);
+          animeData.synopsis =
+            (await translateText(animeData.synopsis)) +
+            " [Traduzido automaticamente pelo Google]";
         }
 
         setAnime(animeData);

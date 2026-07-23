@@ -16,6 +16,23 @@ export const Category = styled(TouchableOpacity, {
   height: 100,
   margin: 5,
 });
+
+export const ShowMoreButton = styled(TouchableOpacity, {
+  alignSelf: "center",
+  marginTop: 10,
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 999,
+  backgroundColor: "#2F3B54",
+});
+
+export const ShowMoreText = styled(Text, {
+  fontFamily: "$heading",
+  fontWeight: "$4",
+  color: "#fff",
+  fontSize: 14,
+});
+
 export const CategoryText = styled(Text, {
   fontFamily: "$heading",
   fontWeight: "$4",

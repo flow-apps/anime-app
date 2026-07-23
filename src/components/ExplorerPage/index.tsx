@@ -1,5 +1,6 @@
 import React from "react";
 
+import HorizontalAnimeScroll from "../HorizontalScrollImages";
 import Categories from "./components/Categories";
 import {
   Container,
@@ -29,16 +30,13 @@ const ExplorerPage: React.FC = () => {
         renderItem={() => <></>}
         ListEmptyComponent={() => (
           <ExplorerContainer nestedScrollEnabled>
-            <Categories
-              categories={[
-                { label: "Ação" },
-                { label: "Premiados" },
-                { label: "Comédia" },
-              ]}
-              onCategoryPress={() => {}}
-            />
+            <Categories onCategoryPress={() => {}} />
             <ExplorerTitle>Notícias</ExplorerTitle>
-            <NewsContainer nestedScrollEnabled horizontal>
+            <NewsContainer
+              showsHorizontalScrollIndicator={false}
+              nestedScrollEnabled
+              horizontal
+            >
               <NewsWrapper>
                 <NewsImage src="https://infinitasvidas.wordpress.com/wp-content/uploads/2024/11/diarios-de-uma-apotecaria-5.png?w=640" />
                 <NewsInfosWrapper>
@@ -70,6 +68,8 @@ const ExplorerPage: React.FC = () => {
                 </NewsButton>
               </NewsWrapper>
             </NewsContainer>
+            <HorizontalAnimeScroll title="Temporada atual" animes={[]} />
+            <HorizontalAnimeScroll title="Futuros Lançamentos" animes={[]} />
           </ExplorerContainer>
         )}
       />

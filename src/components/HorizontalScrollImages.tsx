@@ -22,7 +22,7 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
   onPress,
 }) => {
   return (
-    <ScrollView nestedScrollEnabled padding={15}>
+    <ScrollView nestedScrollEnabled>
       <SizableText
         fontSize={26}
         fontFamily="$heading"
