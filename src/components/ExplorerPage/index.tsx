@@ -20,7 +20,14 @@ const ExplorerPage: React.FC = () => {
         renderItem={() => <></>}
         ListEmptyComponent={() => (
           <ExplorerContainer nestedScrollEnabled>
-            <Categories />
+            <Categories
+              categories={[
+                { label: "Ação" },
+                { label: "Premiados" },
+                { label: "Comédia" },
+              ]}
+              onCategoryPress={() => {}}
+            />
           </ExplorerContainer>
         )}
       />

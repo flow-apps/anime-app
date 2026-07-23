@@ -12,9 +12,9 @@ export const CategoryContainer = styled(View, {
 });
 
 export const Category = styled(TouchableOpacity, {
-  width: "45%",
+  width: "47%",
   height: 100,
-  marginVertical: 10,
+  margin: 5,
 });
 export const CategoryText = styled(Text, {
   fontFamily: "$heading",
