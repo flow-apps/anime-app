@@ -3587,10 +3587,10 @@ expo-updates-interface@~57.0.1:
   resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-57.0.1.tgz#2ff8a65f9ec139743b9b29273e42f2888420db00"
   integrity sha512-+LUWwJ0gf/TEKMVdQAw/Gjih4dvrk+URgy24X9qEGKuuMDZqjBRm9T4yQyBVALGL5TTdPUaB6ILxx3lshm3pwQ==
 
-expo-updates@~57.0.8:
-  version "57.0.8"
-  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-57.0.8.tgz#ec140e203f9e5c306e7e6414f628bc080f3c98f1"
-  integrity sha512-vHQYneTGoPZbA/3dtQlfrWQMyRjqO4t0g2K97Z3VX0K8GSTcANzTPe1MDYncGf7cU/nBIShgWXx7qSbLICEVdQ==
+expo-updates@~57.0.9:
+  version "57.0.9"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-57.0.9.tgz#f4edd97786e43ec7ca7b8bce72e308b269e4e3d2"
+  integrity sha512-VoZETs6ndE4c+KKd08Bjbr6F9xE6wvZXLbhhxPccxwOJPYZ0DETW9jCm2MK/Z8ClZIs7/iBeZoL1QX+NZJbIrg==
   dependencies:
     "@expo/code-signing-certificates" "^0.0.6"
     "@expo/plist" "^0.8.1"

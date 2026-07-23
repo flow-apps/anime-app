@@ -84,7 +84,12 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
           <TouchableOpacity
             onPress={() => setIsExpanded((current) => !current)}
           >
-            <Text style={{ marginTop: 10, fontSize: 14, color: "#2f80ed" }}>
+            <Text
+              style={{ marginTop: 10, fontSize: 14 }}
+              color={"$red"}
+              fontFamily={"$body"}
+              fontWeight={"$2"}
+            >
               {isExpanded ? "Ver menos" : "Ver mais"}
             </Text>
           </TouchableOpacity>

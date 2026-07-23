@@ -19,14 +19,14 @@ const SettingsScreen: React.FC = () => {
     <Container style={{ padding: 10 }}>
       <SwitchInput
         label="Modo Escuro"
-        currentValue={themeName == "dark"}
+        currentValue={themeName === "dark"}
         onSwitch={(isDark: boolean) => {
           setThemeName(isDark ? "dark" : "light");
           Toast.show("Reinicie o app para aplicar", Toast.SHORT);
         }}
       />
       <SwitchInput
-        label="Traduzir textos"
+        label="Traduzir textos (experimental)"
         currentValue={translate}
         onSwitch={(translate: boolean) => {
           setTranslate(translate);
