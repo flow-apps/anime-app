@@ -38,3 +38,7 @@ export interface RecommendationResponse {
   pagination: Pagination;
   data: RecommendationItem[];
 }
+
+export * from "./genre";
+export * from "./news";
+

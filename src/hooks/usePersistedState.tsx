@@ -14,8 +14,9 @@ function usePersistedState<T>(key: string, initialState: any): Response<T> {
 
       if (storagedValue) {
         setState(JSON.parse(storagedValue));
-        setFetched(true);
       }
+
+      setFetched(true);
     })();
   }, []);
 
@@ -23,7 +24,7 @@ function usePersistedState<T>(key: string, initialState: any): Response<T> {
     (async () => {
       await AsyncStorage.setItem(DEFAULT_PREFIX + key, JSON.stringify(state));
     })();
-  }, [key, state]);
+  }, [key, state, setState]);
 
   return [state, setState, fetched];
 }

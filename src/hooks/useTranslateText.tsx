@@ -10,7 +10,7 @@ export function useTranslateText(source?: Languages, target?: Languages) {
         downloadIfNeeded: true,
       });
     })();
-  }, [FastTranslator, source, target]);
+  }, [FastTranslator]);
 
   const translateText = useCallback(
     async (text: string) => {

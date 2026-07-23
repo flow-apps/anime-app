@@ -1,5 +1,14 @@
-import { FlatList, Image, TouchableOpacity } from "react-native";
-import { H1, Input, Paragraph, ScrollView, styled, Text, View } from "tamagui";
+import { FlatList, TouchableOpacity } from "react-native";
+import {
+  H1,
+  Image,
+  Input,
+  Paragraph,
+  ScrollView,
+  styled,
+  Text,
+  View,
+} from "tamagui";
 
 export const Container = styled(View, {
   flex: 1,
@@ -7,7 +16,7 @@ export const Container = styled(View, {
   padding: 15,
 });
 export const ExplorerList = styled(FlatList, {});
-export const ExplorerContainer = styled(ScrollView, {});
+export const ExplorerContainer = styled(View, {});
 export const SearchContainer = styled(View, {});
 export const SearchInput = styled(Input, {
   border: "none",
@@ -39,13 +48,15 @@ export const NewsWrapper = styled(View, {
 export const NewsImage = styled(Image, {
   borderRadius: 15,
   width: "100%",
-  height: 250,
+  height: 400,
   objectFit: "cover",
 });
-export const NewsInfosWrapper = styled(View, {});
+export const NewsInfosWrapper = styled(View, {
+  height: 180,
+});
 export const NewsTitle = styled(Text, {
   fontFamily: "$heading",
-  fontSize: 18,
+  fontSize: 16,
   fontWeight: "$3",
   color: "$textColor",
   marginVertical: 15,

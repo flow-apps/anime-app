@@ -33,9 +33,18 @@ const gradientColors = (): [string, string] => [
   getRandomHexColor(),
 ];
 
+const createGenreColorMap = (items: GenreItem[]) =>
+  items.reduce<Record<number, [string, string]>>((acc, item) => {
+    acc[item.mal_id] = gradientColors();
+    return acc;
+  }, {});
+
 const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
   const [loading, setLoading] = useState(true);
   const [genres, setGenres] = useState<GenreItem[]>([]);
+  const [genreColors, setGenreColors] = useState<
+    Record<number, [string, string]>
+  >({});
   const [visibleCount, setVisibleCount] = useState(6);
   const [translate, setTranslate, updated] = usePersistedState<boolean>(
     "translate_text",
@@ -60,6 +69,7 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
         : data;
 
       setGenres(genresData);
+      setGenreColors(createGenreColorMap(genresData));
       setLoading(false);
     })();
   }, [updated, translate, translateText]);
@@ -77,7 +87,7 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
             <LinearGradient
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              colors={gradientColors()}
+              colors={genreColors[g.mal_id] ?? gradientColors()}
               style={{
                 flex: 1,
                 borderRadius: 15,
