@@ -39,8 +39,6 @@ export const NewsContainer = styled(ScrollView, {
   margin: 15,
 });
 export const NewsWrapper = styled(View, {
-  backgroundColor: "$shape",
-  borderRadius: 15,
   padding: 15,
   width: 300,
   marginRight: 15,
