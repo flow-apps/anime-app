@@ -27,6 +27,8 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
 
   useEffect(() => {
     (async () => {
+      if (!updated) return;
+
       const { data, status } = await api.get<IAnimeResponse>(
         `/anime/${id}/full`,
       );

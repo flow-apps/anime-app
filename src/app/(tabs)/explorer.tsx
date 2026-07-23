@@ -1,9 +1,5 @@
-import { Text, View } from "react-native";
+import ExplorerScreen from "@/screens/Explorer";
 
 export default function Explorer() {
-  return (
-    <View>
-      <Text>Explorar</Text>
-    </View>
-  );
+  return <ExplorerScreen />;
 }
