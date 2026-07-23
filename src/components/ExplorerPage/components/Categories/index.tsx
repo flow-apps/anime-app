@@ -45,7 +45,7 @@ const Categories: React.FC<ICategoriesProps> = ({
                 padding: 10,
               }}
             >
-              <CategoryText>Ação</CategoryText>
+              <CategoryText numberOfLines={2}>{c.label}</CategoryText>
             </LinearGradient>
           </Category>
         ))}
