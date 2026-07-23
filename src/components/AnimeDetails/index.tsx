@@ -43,7 +43,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
           <AnimeInfos>{`${anime.year}  |  ${anime.genres.map((a) => a.name).join(", ")}`}</AnimeInfos>
         </AnimeInfosWrapper>
         <AnimeInfos style={{ marginTop: 5 }}>
-          <FontAwesomeFreeSolid name="star" size={12} color={"#ffd000"} />
+          <FontAwesomeFreeSolid name="star" size={12} color={"#ffd000"} />{" "}
           {anime.score}
         </AnimeInfos>
         {!canExpand ? (
@@ -103,7 +103,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
               allowsFullscreenVideo
               mediaPlaybackRequiresUserAction
               source={{
-                html: `<iframe width="100%" height="100%"
+                html: `<iframe frameborder="0" allowfullscreen width="100%" height="100%"
                       src="${anime.trailer.embed_url}" autoplay="0">
                       </iframe>`,
                 baseUrl: "https://pedrobraga.vercel.app",

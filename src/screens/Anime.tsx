@@ -18,7 +18,7 @@ interface IAnimeResponse {
 const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
   const [anime, setAnime] = useState<TopAnimeItem>();
   const [loading, setLoading] = useState(true);
-  const [translate, setTranslate] = usePersistedState<boolean>(
+  const [translate, setTranslate, updated] = usePersistedState<boolean>(
     "translate_text",
     false,
   );
@@ -35,13 +35,20 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
         const animeData = data.data;
 
         if (translate) {
+          animeData.genres = await Promise.all(
+            animeData.genres.map(async (genre) => ({
+              ...genre,
+              name: await translateText(genre.name),
+            })),
+          );
           animeData.synopsis = await translateText(animeData.synopsis);
         }
+
         setAnime(animeData);
       }
       setLoading(false);
     })();
-  }, [translate]);
+  }, [updated]);
 
   useEffect(() => {
     navigation.setOptions({ title: anime?.title_english });

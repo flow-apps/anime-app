@@ -6,10 +6,13 @@ import { TamaguiProvider } from "tamagui";
 import { config } from "../../tamagui.config";
 
 export default function StackLayout() {
-  const [theme, setTheme] = usePersistedState<"light" | "dark">(
+  const [theme, setTheme, updated] = usePersistedState<"light" | "dark">(
     "theme",
     useColorScheme(),
   );
+
+  if (!updated) return null;
+
   return (
     <TamaguiProvider config={config} defaultTheme={theme}>
       <Stack
@@ -32,7 +35,7 @@ export default function StackLayout() {
             headerBackground: () => (
               <LinearGradient
                 style={{ flex: 1 }}
-                colors={[`#0a121d`, "transparent"]}
+                colors={[`#0a121d`, "#0a121d09"]}
               />
             ),
             headerStyle: {

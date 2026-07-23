@@ -14,7 +14,9 @@ export function useTranslateText() {
 
   const translateText = useCallback(
     async (text: string) => {
-      return FastTranslator.translate(text).then((result) => result);
+      return FastTranslator.translate(text).then(
+        (result) => result,
+      ) as Promise<string>;
     },
     [FastTranslator],
   );
