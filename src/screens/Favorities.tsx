@@ -4,13 +4,7 @@ import { TopAnimeItem } from "@/types/top";
 import { router, useFocusEffect } from "expo-router";
 import React from "react";
 import { FlatList, TouchableOpacity } from "react-native";
-import { Image, Paragraph, styled, Text, useTheme, View } from "tamagui";
-
-const Container = styled(View, {
-  backgroundColor: "$bg",
-  flex: 1,
-  paddingTop: 20,
-});
+import { Image, Paragraph, Text, useTheme, View } from "tamagui";
 
 const FavoritiesScreen: React.FC = () => {
   const [favorites, _, updated, reloadState] = usePersistedState<
@@ -33,17 +27,16 @@ const FavoritiesScreen: React.FC = () => {
   if (!updated) return <Loading />;
 
   return (
-    <Container>
+    <View flex={1} backgroundColor="$bg" alignItems="center">
       <FlatList
         data={favorites}
         keyExtractor={({ mal_id }) => mal_id.toString()}
         numColumns={2}
         contentContainerStyle={{
-          alignItems: "center",
-          justifyContent: "center",
+          justifyContent: favorites.length > 0 ? "center" : "flex-start",
           width: "100%",
-          backgroundColor: bg.val,
-          flex: 1,
+          flexGrow: 1,
+          paddingTop: 20,
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -108,7 +101,7 @@ const FavoritiesScreen: React.FC = () => {
           </View>
         }
       />
-    </Container>
+    </View>
   );
 };
 
