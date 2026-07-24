@@ -26,10 +26,14 @@ const FavoritiesScreen: React.FC = () => {
 
   if (!updated) return <Loading />;
 
+  const sortedFavorites = [...favorites].sort((a, b) =>
+    (a.title_english || a.title).localeCompare(b.title_english || b.title),
+  );
+
   return (
     <View flex={1} backgroundColor="$bg" alignItems="center">
       <FlatList
-        data={favorites}
+        data={sortedFavorites}
         keyExtractor={({ mal_id }) => mal_id.toString()}
         numColumns={2}
         contentContainerStyle={{

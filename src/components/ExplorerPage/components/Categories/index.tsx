@@ -64,26 +64,39 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
 
       if (!!categoriesCache.length) {
         categoriesData = categoriesCache;
+        const sortedCache = [...categoriesCache].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+        if (JSON.stringify(sortedCache) !== JSON.stringify(categoriesCache)) {
+          setCategoriesCache(sortedCache);
+        }
+        categoriesData = sortedCache;
       } else {
         const {
           data: { data },
         } = await api.get<GenreResponse>("/genres/anime");
 
-        categoriesData = data;
-        setCategoriesCache(categoriesData);
+        const sortedData = [...data].sort((a, b) =>
+          a.name.localeCompare(b.name),
+        );
+        categoriesData = sortedData;
+        setCategoriesCache(sortedData);
       }
 
-      const genresData = translate
-        ? await Promise.all(
-            categoriesData.map(async (genre) => ({
-              ...genre,
-              name: await translateText(genre.name),
-            })),
-          )
-        : categoriesData;
-
-      setGenres(genresData);
-      setGenreColors(createGenreColorMap(genresData));
+      if (translate) {
+        const translatedGenres = await Promise.all(
+          categoriesData.map(async (genre) => ({
+            ...genre,
+            name: await translateText(genre.name),
+          })),
+        );
+        setGenres(
+          translatedGenres.sort((a, b) => a.name.localeCompare(b.name)),
+        );
+      } else {
+        setGenres(categoriesData);
+      }
+      setGenreColors(createGenreColorMap(categoriesData));
       setLoading(false);
     })();
   }, [updated, updatedCategories, translate, translateText]);
@@ -117,7 +130,9 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
       {genres.length > 6 && (
         <ShowMoreButton
           onPress={() =>
-            setVisibleCount((count) => (count >= genres.length ? 6 : count + 6))
+            setVisibleCount((count) =>
+              count >= genres.length ? 6 : count + 40,
+            )
           }
         >
           <ShowMoreText>
