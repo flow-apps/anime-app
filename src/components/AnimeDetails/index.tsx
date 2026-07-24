@@ -85,9 +85,9 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
             style={{ backgroundColor: isFavorited ? red.val : shape.val }}
           >
             {isFavorited ? (
-              <FontAwesomeFreeSolid name="heart" color={"#fff"} size={25} />
+              <FontAwesomeFreeSolid name="heart" color={"#fff"} size={20} />
             ) : (
-              <Feather name="heart" color={red.val} size={25} />
+              <Feather name="heart" color={red.val} size={20} />
             )}
           </AnimeFavoriteButton>
         </AnimeFavoriteButtonContainer>

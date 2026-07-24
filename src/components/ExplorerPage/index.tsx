@@ -114,6 +114,24 @@ const NewsSection: React.FC = React.memo(() => {
   );
 });
 
+const EmptyListComponent = React.memo(
+  ({
+    searching,
+    onCategoryPress,
+  }: {
+    searching: boolean;
+    onCategoryPress: (genre: GenreItem) => void;
+  }) =>
+    searching ? (
+      <Loading />
+    ) : (
+      <ExplorerContainer>
+        <Categories onCategoryPress={onCategoryPress} />
+        <NewsSection />
+      </ExplorerContainer>
+    ),
+);
+
 const ExplorerPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [searching, setSearching] = useState(false);
@@ -231,19 +249,11 @@ const ExplorerPage: React.FC = () => {
           </TouchableOpacity>
         )}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={() =>
-          searching ? (
-            <Loading />
-          ) : (
-            <ExplorerContainer>
-              <Categories
-                onCategoryPress={(genre: GenreItem) =>
-                  handleSearch(genre.mal_id, genre.name)
-                }
-              />
-              <NewsSection />
-            </ExplorerContainer>
-          )
+        ListEmptyComponent={
+          <EmptyListComponent
+            searching={searching}
+            onCategoryPress={(genre) => handleSearch(genre.mal_id, genre.name)}
+          />
         }
       />
     </Container>
