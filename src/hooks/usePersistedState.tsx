@@ -1,7 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-type Response<T> = [T, Dispatch<SetStateAction<T>>, boolean];
+type Response<T> = [
+  T,
+  Dispatch<SetStateAction<T>>,
+  boolean,
+  () => Promise<void>,
+];
 
 const DEFAULT_PREFIX = "ANIME_APP@";
 function usePersistedState<T>(key: string, initialState: T): Response<T> {
@@ -12,24 +24,29 @@ function usePersistedState<T>(key: string, initialState: T): Response<T> {
 
   useEffect(() => {
     (async () => {
-      try {
-        const storagedValue = await AsyncStorage.getItem(DEFAULT_PREFIX + key);
-
-        if (storagedValue !== null) {
-          const parsedValue = JSON.parse(storagedValue);
-          setState(parsedValue);
-          initialValueRef.current = parsedValue;
-        } else {
-          initialValueRef.current = initialState;
-        }
-      } catch (error) {
-        console.error("Failed to load state from AsyncStorage", error);
-        initialValueRef.current = initialState;
-      } finally {
-        setFetched(true);
-      }
+      await reloadState();
     })();
-  }, [key, initialState]);
+  }, [key]);
+
+  const reloadState = useCallback(async () => {
+    setFetched(false);
+    try {
+      const storagedValue = await AsyncStorage.getItem(DEFAULT_PREFIX + key);
+
+      if (storagedValue !== null) {
+        const parsedValue = JSON.parse(storagedValue);
+        setState(parsedValue);
+        initialValueRef.current = parsedValue;
+      } else {
+        initialValueRef.current = initialState;
+      }
+    } catch (error) {
+      console.error("Failed to load state from AsyncStorage", error);
+      initialValueRef.current = initialState;
+    } finally {
+      setFetched(true);
+    }
+  }, [key]);
 
   useEffect(() => {
     if (!fetched || initialValueRef.current === undefined) {
@@ -47,7 +64,7 @@ function usePersistedState<T>(key: string, initialState: T): Response<T> {
     })();
   }, [key, state, fetched]);
 
-  return [state, setState, fetched];
+  return [state, setState, fetched, reloadState];
 }
 
 export { usePersistedState };

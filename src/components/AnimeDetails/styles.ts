@@ -22,7 +22,6 @@ export const AnimeTitle = styled(H1, {
   fontSize: 24,
   color: "$textColor",
   marginBottom: 5,
-  height: 60,
 });
 export const AnimeInfosWrapper = styled(View, {
   flexDirection: "row",
@@ -51,7 +50,7 @@ export const AnimeFavoriteButtonContainer = styled(View, {
   flexDirection: "row",
   position: "absolute",
   right: 0,
-  top: 60,
+  top: -55,
   marginHorizontal: 15,
 });
 export const AnimeFavoriteButton = styled(TouchableOpacity, {

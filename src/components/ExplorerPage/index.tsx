@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Image as RNImage, TouchableOpacity } from "react-native";
+import {
+  FlatList,
+  Image as RNImage,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
@@ -8,7 +13,7 @@ import { GenreItem, NewsItem, NewsResponse } from "@/types";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { openUrl } from "@/utils";
 import Feather from "@react-native-vector-icons/feather";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Image, Paragraph, Text, View } from "tamagui";
 import Loading from "../Loading";
 import Categories from "./components/Categories";
@@ -127,7 +132,9 @@ const EmptyListComponent = React.memo(
     ) : (
       <ExplorerContainer>
         <Categories onCategoryPress={onCategoryPress} />
-        <NewsSection />
+        <ScrollView>
+          <NewsSection />
+        </ScrollView>
       </ExplorerContainer>
     ),
 );
@@ -136,6 +143,11 @@ const ExplorerPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+
+  useFocusEffect(() => {
+    setSearchInput("");
+    setSearchResults([]);
+  });
 
   const handleSearch = async (genre?: string | number, genreName?: string) => {
     setSearching(true);

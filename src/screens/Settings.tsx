@@ -8,7 +8,7 @@ import Toast from "react-native-simple-toast";
 const SettingsScreen: React.FC = () => {
   const [themeName, setThemeName] = usePersistedState<"dark" | "light">(
     "theme",
-    useColorScheme(),
+    useColorScheme() as "dark" | "light",
   );
   const [translate, setTranslate] = usePersistedState<boolean>(
     "translate_text",

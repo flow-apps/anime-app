@@ -8,7 +8,7 @@ import { config } from "../../tamagui.config";
 export default function StackLayout() {
   const [theme, setTheme, updated] = usePersistedState<"light" | "dark">(
     "theme",
-    useColorScheme(),
+    useColorScheme() as "dark" | "light",
   );
 
   if (!updated) return null;
