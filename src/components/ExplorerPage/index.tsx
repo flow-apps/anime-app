@@ -4,7 +4,7 @@ import { FlatList, Image as RNImage, TouchableOpacity } from "react-native";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
 import { api } from "@/services/api";
-import { NewsItem, NewsResponse } from "@/types";
+import { GenreItem, NewsItem, NewsResponse } from "@/types";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { openUrl } from "@/utils";
 import Feather from "@react-native-vector-icons/feather";
@@ -64,7 +64,7 @@ const NewsSection: React.FC = React.memo(() => {
       try {
         const {
           data: { data },
-        } = await api.get<NewsResponse>("/news?limit=50");
+        } = await api.get<NewsResponse>("/news?limit=25");
         let newsData = data;
 
         if (translate) {
@@ -119,14 +119,29 @@ const ExplorerPage: React.FC = () => {
   const [searching, setSearching] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
-  const handleSearch = async () => {
+  const handleSearch = async (genre?: string | number, genreName?: string) => {
     setSearching(true);
 
-    const {
-      data: { data },
-    } = await api.get<AnimeSearchResponse>(`/anime?q=${searchInput}&limit=20`);
+    let animeData: Anime[];
 
-    setSearchResults(data);
+    if (genre) {
+      const {
+        data: { data },
+      } = await api.get<AnimeSearchResponse>(`/anime?genres=${genre}&limit=50`);
+
+      setSearchInput(genreName!);
+      animeData = data;
+    } else {
+      const {
+        data: { data },
+      } = await api.get<AnimeSearchResponse>(
+        `/anime?q=${searchInput}&limit=20`,
+      );
+
+      animeData = data;
+    }
+
+    setSearchResults(animeData);
     setSearching(false);
   };
 
@@ -157,7 +172,7 @@ const ExplorerPage: React.FC = () => {
           </SearchButton>
         )}
         {searchInput.length > 0 && !searchResults.length && (
-          <SearchButton onPress={handleSearch}>
+          <SearchButton onPress={() => handleSearch()}>
             <Feather name="search" color={"#fff"} size={16} />
           </SearchButton>
         )}
@@ -199,7 +214,7 @@ const ExplorerPage: React.FC = () => {
               numberOfLines={2}
               height={40}
             >
-              {item.title_english}
+              {item.title_english || item.title}
             </Text>
             <View>
               <Paragraph
@@ -221,7 +236,11 @@ const ExplorerPage: React.FC = () => {
             <Loading />
           ) : (
             <ExplorerContainer>
-              <Categories onCategoryPress={() => {}} />
+              <Categories
+                onCategoryPress={(genre: GenreItem) =>
+                  handleSearch(genre.mal_id, genre.name)
+                }
+              />
               <NewsSection />
             </ExplorerContainer>
           )
