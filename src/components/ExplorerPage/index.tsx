@@ -64,7 +64,7 @@ const NewsSection: React.FC = React.memo(() => {
       try {
         const {
           data: { data },
-        } = await api.get<NewsResponse>("/news?limit=25");
+        } = await api.get<NewsResponse>("/news?limit=15");
         let newsData = data;
 
         if (translate) {

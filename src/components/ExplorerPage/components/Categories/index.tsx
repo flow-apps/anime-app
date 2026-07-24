@@ -50,29 +50,43 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
     "translate_text",
     false,
   );
+
+  const [categoriesCache, setCategoriesCache, updatedCategories] =
+    usePersistedState<GenreItem[]>("categories_cache", []);
+
   const { translateText } = useTranslateText();
 
   useEffect(() => {
     (async () => {
-      if (!updated) return;
-      const {
-        data: { data },
-      } = await api.get<GenreResponse>("/genres/anime");
+      if (!updated || !updatedCategories) return;
+
+      let categoriesData: GenreItem[];
+
+      if (!!categoriesCache.length) {
+        categoriesData = categoriesCache;
+      } else {
+        const {
+          data: { data },
+        } = await api.get<GenreResponse>("/genres/anime");
+
+        categoriesData = data;
+        setCategoriesCache(categoriesData);
+      }
 
       const genresData = translate
         ? await Promise.all(
-            data.map(async (genre) => ({
+            categoriesData.map(async (genre) => ({
               ...genre,
               name: await translateText(genre.name),
             })),
           )
-        : data;
+        : categoriesData;
 
       setGenres(genresData);
       setGenreColors(createGenreColorMap(genresData));
       setLoading(false);
     })();
-  }, [updated, translate, translateText]);
+  }, [updated, updatedCategories, translate, translateText]);
 
   const visibleGenres = genres.slice(0, visibleCount);
   const hasMoreGenres = visibleCount < genres.length;
