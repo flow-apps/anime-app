@@ -1,3 +1,4 @@
+import { Anime } from "@/types/anime";
 import { FlatList, TouchableOpacity } from "react-native";
 import {
   H1,
@@ -15,9 +16,13 @@ export const Container = styled(View, {
   backgroundColor: "$bg",
   padding: 15,
 });
-export const ExplorerList = styled(FlatList, {});
+export const ExplorerList = styled(FlatList<Anime>, {
+  flexWrap: "wrap",
+});
 export const ExplorerContainer = styled(View, {});
-export const SearchContainer = styled(View, {});
+export const SearchContainer = styled(View, {
+  flexDirection: "row",
+});
 export const SearchInput = styled(Input, {
   border: "none",
   backgroundColor: "$shape",
@@ -25,7 +30,19 @@ export const SearchInput = styled(Input, {
   fontWeight: "$2",
   fontSize: "$2",
   padding: 10,
-  borderRadius: 12,
+  color: "$textColor",
+  flex: 1,
+  borderTopLeftRadius: 12,
+  borderBottomLeftRadius: 12,
+});
+
+export const SearchButton = styled(TouchableOpacity, {
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "$red",
+  paddingHorizontal: 20,
+  borderTopRightRadius: 12,
+  borderBottomRightRadius: 12,
 });
 
 export const ExplorerTitle = styled(H1, {
@@ -77,3 +94,5 @@ export const NewsButtonText = styled(Text, {
   fontFamily: "$body",
   fontWeight: "$2",
 });
+
+export const SearchItemsContainer = styled(View, {});
