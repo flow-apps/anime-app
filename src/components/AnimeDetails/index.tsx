@@ -1,4 +1,6 @@
+import { usePersistedState } from "@/hooks/usePersistedState";
 import { TopAnimeItem } from "@/types/top";
+import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
@@ -8,6 +10,8 @@ import {
   AnimeBanner,
   AnimeBannerContainer,
   AnimeDetailsContainer,
+  AnimeFavoriteButton,
+  AnimeFavoriteButtonContainer,
   AnimeInfos,
   AnimeInfosContainer,
   AnimeInfosWrapper,
@@ -23,11 +27,25 @@ interface IAnimeDetailsProps {
 const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [canExpand, setCanExpand] = useState(false);
+  const [favorites, setFavorites] = usePersistedState<TopAnimeItem[]>(
+    "favorites",
+    [],
+  );
 
-  const { bg } = useTheme();
+  const { bg, red, shape } = useTheme();
 
   const handleTextLayout = (event: any) => {
     setCanExpand(event.nativeEvent.lines.length > 3);
+  };
+
+  const isFavorited = favorites.some((fav) => fav.mal_id === anime.mal_id);
+
+  const handleFavorite = () => {
+    if (isFavorited) {
+      setFavorites(favorites.filter((fav) => fav.mal_id !== anime.mal_id));
+    } else {
+      setFavorites([...favorites, anime]);
+    }
   };
 
   return (
@@ -61,6 +79,18 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
             {anime.synopsis}
           </Text>
         ) : null}
+        <AnimeFavoriteButtonContainer>
+          <AnimeFavoriteButton
+            onPress={handleFavorite}
+            style={{ backgroundColor: isFavorited ? red.val : shape.val }}
+          >
+            {isFavorited ? (
+              <FontAwesomeFreeSolid name="heart" color={"#fff"} size={25} />
+            ) : (
+              <Feather name="heart" color={red.val} size={25} />
+            )}
+          </AnimeFavoriteButton>
+        </AnimeFavoriteButtonContainer>
         <AnimeSynopsisContainer>
           <Text
             numberOfLines={isExpanded ? undefined : 3}

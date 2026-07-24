@@ -1,4 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
+import { TouchableOpacity } from "react-native";
 import { H1, Image, Paragraph, styled, View } from "tamagui";
 import { Container } from "../Container";
 
@@ -43,4 +44,19 @@ export const AnimeSynopsisFade = styled(LinearGradient, {
   right: 0,
   bottom: 0,
   height: 24,
+});
+
+export const AnimeFavoriteButtonContainer = styled(View, {
+  flexDirection: "row",
+  position: "absolute",
+  right: 0,
+  marginHorizontal: 15,
+});
+export const AnimeFavoriteButton = styled(TouchableOpacity, {
+  width: 70,
+  height: 70,
+  backgroundColor: "$shape",
+  borderRadius: "50%",
+  alignItems: "center",
+  justifyContent: "center",
 });
