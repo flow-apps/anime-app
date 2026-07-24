@@ -1,30 +1,51 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 type Response<T> = [T, Dispatch<SetStateAction<T>>, boolean];
 
 const DEFAULT_PREFIX = "ANIME_APP@";
-function usePersistedState<T>(key: string, initialState: any): Response<T> {
+function usePersistedState<T>(key: string, initialState: T): Response<T> {
+  const initialValueRef = useRef<T | undefined>(undefined);
+
   const [state, setState] = useState<T>(initialState);
   const [fetched, setFetched] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const storagedValue = await AsyncStorage.getItem(DEFAULT_PREFIX + key);
+      try {
+        const storagedValue = await AsyncStorage.getItem(DEFAULT_PREFIX + key);
 
-      if (storagedValue) {
-        setState(JSON.parse(storagedValue));
+        if (storagedValue !== null) {
+          const parsedValue = JSON.parse(storagedValue);
+          setState(parsedValue);
+          initialValueRef.current = parsedValue;
+        } else {
+          initialValueRef.current = initialState;
+        }
+      } catch (error) {
+        console.error("Failed to load state from AsyncStorage", error);
+        initialValueRef.current = initialState;
+      } finally {
+        setFetched(true);
       }
-
-      setFetched(true);
     })();
-  }, []);
+  }, [key, initialState]);
 
   useEffect(() => {
+    if (!fetched || initialValueRef.current === undefined) {
+      return;
+    }
+
+    if (state === initialValueRef.current) return;
+
     (async () => {
-      await AsyncStorage.setItem(DEFAULT_PREFIX + key, JSON.stringify(state));
+      try {
+        await AsyncStorage.setItem(DEFAULT_PREFIX + key, JSON.stringify(state));
+      } catch (error) {
+        console.error("Failed to save state to AsyncStorage", error);
+      }
     })();
-  }, [key, state, setState]);
+  }, [key, state, fetched]);
 
   return [state, setState, fetched];
 }

@@ -118,20 +118,13 @@ const ExplorerPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const { translateText } = useTranslateText("Portuguese", "English");
-  const [translate, _, updated] = usePersistedState<boolean>(
-    "translate_text",
-    true,
-  );
 
   const handleSearch = async () => {
     setSearching(true);
 
     const {
       data: { data },
-    } = await api.get<AnimeSearchResponse>(
-      `/anime?q=${await translateText(searchInput)}&limit=20`,
-    );
+    } = await api.get<AnimeSearchResponse>(`/anime?q=${searchInput}&limit=20`);
 
     setSearchResults(data);
     setSearching(false);
@@ -158,7 +151,7 @@ const ExplorerPage: React.FC = () => {
           placeholder="Pesquisar anime..."
           disabled={!!searchResults.length}
         />
-        {searchResults.length && (
+        {!!searchResults.length && (
           <SearchButton onPress={handleClearSearch}>
             <Feather name="x" color={"#fff"} size={16} />
           </SearchButton>
@@ -172,21 +165,21 @@ const ExplorerPage: React.FC = () => {
       <ExplorerList
         data={searchResults}
         keyExtractor={({ mal_id }) => mal_id.toString()}
+        numColumns={2}
         contentContainerStyle={{
-          flexDirection: "row",
-          flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "center",
+          width: "100%",
           marginVertical: 20,
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => handleOpenAnime(item.mal_id)}
             style={{
-              marginRight: 25,
               justifyContent: "center",
               alignItems: "center",
               marginBottom: 20,
+              marginHorizontal: 10,
             }}
           >
             <Image
