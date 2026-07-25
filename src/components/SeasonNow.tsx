@@ -1,5 +1,6 @@
 import HorizontalAnimeScroll from "@/components/HorizontalScrollImages";
 import Loading from "@/components/Loading";
+import { usePersistedState } from "@/hooks/usePersistedState";
 import { api } from "@/services/api";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { router } from "expo-router";
@@ -13,15 +14,20 @@ const SeasonNow: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
 
   const fetchSeasonNow = useCallback(async (pageNum: number) => {
     const isFirstPage = pageNum === 1;
     if (isFirstPage) setLoading(true);
     else setLoadingMore(true);
     try {
-      const { data } = await api.get<AnimeSearchResponse>(
-        `/seasons/now?page=${pageNum}&limit=15`,
-      );
+      const { data } = await api.get<AnimeSearchResponse>(`/seasons/now`, {
+        params: {
+          page: pageNum,
+          limit: 15,
+          sfw: !adultContent,
+        },
+      });
       setAnimes((prev) => (isFirstPage ? data.data : [...prev, ...data.data]));
       setHasMore(data.pagination.has_next_page);
       setPage(pageNum);
