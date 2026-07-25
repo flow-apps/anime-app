@@ -20,7 +20,7 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [translate, setTranslate, updated] = usePersistedState<boolean>(
     "translate_text",
-    false,
+    true,
   );
   const { translateText } = useTranslateText();
   const navigation = useNavigation();

@@ -15,6 +15,11 @@ const SettingsScreen: React.FC = () => {
     true,
   );
 
+  const [adultContent, setAdultContent] = usePersistedState<boolean>(
+    "adult_content",
+    false,
+  );
+
   return (
     <Container style={{ padding: 10 }}>
       <SwitchInput
@@ -30,6 +35,13 @@ const SettingsScreen: React.FC = () => {
         currentValue={translate}
         onSwitch={(translate: boolean) => {
           setTranslate(translate);
+        }}
+      />
+      <SwitchInput
+        label="Exibir conteúdo adulto"
+        currentValue={adultContent}
+        onSwitch={(adult: boolean) => {
+          setAdultContent(adult);
         }}
       />
     </Container>

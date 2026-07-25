@@ -33,23 +33,18 @@ export default function TabLayout() {
       try {
         await Promise.all([
           FastTranslator.prepare({
+            source: "Japanese",
+            target: "Portuguese",
+            downloadIfNeeded: true,
+          }),
+          FastTranslator.prepare({
+            source: "Japanese",
+            target: "English",
+            downloadIfNeeded: true,
+          }),
+          FastTranslator.prepare({
             source: "English",
             target: "Portuguese",
-            downloadIfNeeded: true,
-          }),
-          FastTranslator.prepare({
-            source: "Portuguese",
-            target: "English",
-            downloadIfNeeded: true,
-          }),
-          FastTranslator.prepare({
-            source: "Japanese",
-            target: "Portuguese",
-            downloadIfNeeded: true,
-          }),
-          FastTranslator.prepare({
-            source: "Japanese",
-            target: "English",
             downloadIfNeeded: true,
           }),
         ]);
