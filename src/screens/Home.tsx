@@ -2,6 +2,7 @@ import { Container } from "@/components/Container";
 import HomeSlider from "@/components/HomeSlider";
 import HorizontalAnimeScroll from "@/components/HorizontalScrollImages";
 import Loading from "@/components/Loading";
+import { usePersistedState } from "@/hooks/usePersistedState";
 import { api } from "@/services/api";
 import { AnimeEntry, RecommendationResponse } from "@/types";
 import { TopAnimeItem, TopResponse } from "@/types/top";
@@ -21,6 +22,7 @@ const HomeScreen: React.FC = () => {
   const [recAnimesPage, setRecAnimesPage] = useState(1);
 
   const [hasMore, setHasMore] = useState({ top: true, rec: true });
+  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -68,9 +70,12 @@ const HomeScreen: React.FC = () => {
 
     setLoadingMore((prev) => ({ ...prev, top: true }));
     const nextPage = topAnimesPage + 1;
-    const { data, status } = await api.get<TopResponse>(
-      `/top/anime?page=${nextPage}`,
-    );
+    const { data, status } = await api.get<TopResponse>(`/top/anime`, {
+      params: {
+        page: nextPage,
+        sfw: !adultContent,
+      },
+    });
     if (status === 200) {
       setTopAnimes((prev) => [...prev, ...data.data]);
       setTopAnimesPage(nextPage);
@@ -85,7 +90,13 @@ const HomeScreen: React.FC = () => {
     setLoadingMore((prev) => ({ ...prev, rec: true }));
     const nextPage = recAnimesPage + 1;
     const { data, status } = await api.get<RecommendationResponse>(
-      `/recommendations/anime?page=${nextPage}`,
+      `/recommendations/anime`,
+      {
+        params: {
+          page: nextPage,
+          sfw: !adultContent,
+        },
+      },
     );
     if (status === 200) {
       const newEntries = data.data.flatMap((a) => a.entry);

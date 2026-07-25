@@ -58,6 +58,7 @@ function usePersistedState<T>(key: string, initialState: T): Response<T> {
     (async () => {
       try {
         await AsyncStorage.setItem(DEFAULT_PREFIX + key, JSON.stringify(state));
+        await reloadState();
       } catch (error) {
         console.error("Failed to save state to AsyncStorage", error);
       }

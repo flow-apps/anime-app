@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Keyboard, ScrollView, TouchableOpacity } from "react-native";
 
+import { usePersistedState } from "@/hooks/usePersistedState";
 import { api } from "@/services/api";
 import { GenreItem } from "@/types";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
@@ -21,6 +22,8 @@ import {
   SearchContainer,
   SearchInput,
 } from "./styles";
+
+import SimpleToast from "react-native-simple-toast";
 
 const EmptyListComponent = React.memo(
   ({
@@ -56,6 +59,8 @@ const ExplorerPage: React.FC = () => {
     string | number | undefined
   >();
 
+  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
+
   const fetchAnimes = async (
     pageNum: number,
     query?: string,
@@ -72,12 +77,19 @@ const ExplorerPage: React.FC = () => {
           limit: 24,
           q: query,
           genres: genre,
+          sfw: !adultContent,
         },
       });
 
       setSearchResults((prev) =>
         isNewSearch ? data.data : [...prev, ...data.data],
       );
+
+      if (data.data.length === 0) {
+        setSearchInput("");
+        SimpleToast.show("Nenhum anime encontrado", SimpleToast.SHORT);
+      }
+
       setHasMore(data.pagination.has_next_page);
     } catch (error) {
       console.error("Failed to fetch animes:", error);
@@ -143,6 +155,7 @@ const ExplorerPage: React.FC = () => {
           onChangeText={setSearchInput}
           placeholder="Pesquisar anime..."
           onSubmitEditing={() => handleSearch()}
+          disabled={!!searchResults.length}
         />
         {!!searchResults.length && (
           <SearchButton onPress={handleClearSearch}>
@@ -168,8 +181,7 @@ const ExplorerPage: React.FC = () => {
             onPress={() => handleOpenAnime(item.mal_id)}
             style={{
               alignItems: "center",
-              marginBottom: 20,
-              marginHorizontal: 10,
+              margin: 20,
             }}
           >
             <Image

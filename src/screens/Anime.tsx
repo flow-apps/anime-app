@@ -22,6 +22,7 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
     "translate_text",
     true,
   );
+
   const { translateText } = useTranslateText();
   const navigation = useNavigation();
 
