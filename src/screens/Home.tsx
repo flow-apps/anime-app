@@ -7,7 +7,8 @@ import { AnimeEntry, RecommendationResponse } from "@/types";
 import { TopAnimeItem, TopResponse } from "@/types/top";
 import { shuffle } from "@/utils";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import LottieView from "lottie-react-native";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 
 const HomeScreen: React.FC = () => {
   const [animesRec, setAnimesRec] = useState<AnimeEntry[]>([]);
@@ -95,6 +96,20 @@ const HomeScreen: React.FC = () => {
     setLoadingMore((prev) => ({ ...prev, rec: false }));
   }, [loadingMore.rec, hasMore.rec, recAnimesPage]);
 
+  const renderFooter = (loading: boolean): ReactNode => {
+    if (!loading) return null;
+
+    return (
+      <LottieView
+        source={require("@/assets/animations/loading.json")}
+        style={{ width: 100, height: 100, alignSelf: "center" }}
+        autoPlay
+        loop
+        testID="loading-animation"
+      />
+    );
+  };
+
   if (loading) return <Loading />;
 
   return (
@@ -120,6 +135,7 @@ const HomeScreen: React.FC = () => {
           });
         }}
         onEndReached={loadMoreTopAnimes}
+        ListFooterComponent={renderFooter(loadingMore.top)}
         animes={topAnimes.map((a) => {
           return {
             name: a.title_english || a.title,
@@ -138,6 +154,8 @@ const HomeScreen: React.FC = () => {
             params: { id },
           });
         }}
+        onEndReached={loadMoreRecAnimes}
+        ListFooterComponent={renderFooter(loadingMore.rec)}
         animes={animesRec.map((a) => {
           return {
             name: a.title,

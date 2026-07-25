@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Keyboard,
   Image as RNImage,
@@ -15,7 +14,8 @@ import { GenreItem, NewsItem, NewsResponse } from "@/types";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { openUrl } from "@/utils";
 import Feather from "@react-native-vector-icons/feather";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
+import LottieView from "lottie-react-native";
 import { Image, Paragraph, Text, View } from "tamagui";
 import Loading from "../Loading";
 import Categories from "./components/Categories";
@@ -58,20 +58,26 @@ const NewsSection: React.FC = React.memo(() => {
   const { translateText } = useTranslateText();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [translate, _, updated] = usePersistedState<boolean>(
     "translate_text",
     true,
   );
 
-  useEffect(() => {
-    (async () => {
+  const fetchNews = useCallback(
+    async (pageNum: number) => {
       if (!updated) return;
-      setLoading(true);
+      const isFirstPage = pageNum === 1;
+      if (isFirstPage) setLoading(true);
+      else setLoadingMore(true);
 
       try {
-        const {
-          data: { data },
-        } = await api.get<NewsResponse>("/news?limit=10");
+        const { data: responseData } = await api.get<NewsResponse>(
+          `/news?page=${pageNum}&limit=10`,
+        );
+        const { data, pagination } = responseData;
         let newsData = data;
 
         if (translate) {
@@ -86,13 +92,46 @@ const NewsSection: React.FC = React.memo(() => {
             }),
           );
         }
-
-        setNews(newsData);
+        setNews((prev) => (isFirstPage ? newsData : [...prev, ...newsData]));
+        setHasMore(pagination.has_next_page);
+        setPage(pageNum);
       } finally {
-        setLoading(false);
+        if (isFirstPage) setLoading(false);
+        else setLoadingMore(false);
       }
-    })();
-  }, [updated, translate, translateText]);
+    },
+    [updated, translate, translateText],
+  );
+
+  useEffect(() => {
+    fetchNews(1);
+  }, [fetchNews]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchNews(page + 1);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+
+    return (
+      <View
+        alignItems="center"
+        justifyContent="center"
+        marginHorizontal={20}
+        width={100}
+      >
+        <LottieView
+          source={require("../../../assets/animations/loading.json")}
+          style={{ width: 100, height: 100 }}
+          autoPlay
+          loop
+        />
+      </View>
+    );
+  };
 
   if (loading) return <Loading />;
 
@@ -116,6 +155,9 @@ const NewsSection: React.FC = React.memo(() => {
         )}
         showsHorizontalScrollIndicator={false}
         horizontal
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
       />
     </>
   );
@@ -152,16 +194,6 @@ const ExplorerPage: React.FC = () => {
   const [currentGenre, setCurrentGenre] = useState<
     string | number | undefined
   >();
-
-  useFocusEffect(
-    useCallback(() => {
-      setSearchInput("");
-      setSearchResults([]);
-      setCurrentQuery("");
-      setCurrentGenre(undefined);
-      setPage(1);
-    }, []),
-  );
 
   const fetchAnimes = async (
     pageNum: number,
@@ -230,8 +262,16 @@ const ExplorerPage: React.FC = () => {
 
   const renderFooter = () => {
     if (!loadingMore) return null;
-    // Usando a View para adicionar um espaçamento e evitar que o indicador cole na borda
-    return <View paddingVertical={20}>{<ActivityIndicator />}</View>;
+    return (
+      <View paddingVertical={20} alignItems="center" justifyContent="center">
+        <LottieView
+          source={require("../../../assets/animations/loading.json")}
+          style={{ width: 100, height: 100 }}
+          autoPlay
+          loop
+        />
+      </View>
+    );
   };
 
   return (
@@ -260,7 +300,6 @@ const ExplorerPage: React.FC = () => {
         numColumns={2}
         contentContainerStyle={{
           alignItems: "center",
-          justifyContent: "center",
           width: "100%",
           marginVertical: 20,
         }}
@@ -268,7 +307,6 @@ const ExplorerPage: React.FC = () => {
           <TouchableOpacity
             onPress={() => handleOpenAnime(item.mal_id)}
             style={{
-              justifyContent: "center",
               alignItems: "center",
               marginBottom: 20,
               marginHorizontal: 10,
