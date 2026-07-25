@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Image as RNImage } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { FlatList, Image as RNImage, ListRenderItem } from "react-native";
 
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
@@ -34,6 +34,29 @@ const NewsCardImage: React.FC<NewsCardImageProps> = React.memo(({ source }) => {
       src={currentSource}
       onError={() => setCurrentSource(placeholderImage)}
     />
+  );
+});
+
+interface NewsCardProps {
+  item: NewsItem;
+}
+
+const NewsCard: React.FC<NewsCardProps> = React.memo(({ item }) => {
+  const handlePress = useCallback(() => {
+    openUrl(item.forum_url);
+  }, [item.forum_url]);
+
+  return (
+    <NewsWrapper>
+      <NewsCardImage source={item.images.jpg.image_url} />
+      <NewsInfosWrapper>
+        <NewsTitle numberOfLines={3}>{item.title}</NewsTitle>
+        <NewsDescription numberOfLines={6}>{item.excerpt}</NewsDescription>
+      </NewsInfosWrapper>
+      <NewsButton onPress={handlePress}>
+        <NewsButtonText>Ver notícia completa</NewsButtonText>
+      </NewsButton>
+    </NewsWrapper>
   );
 });
 
@@ -104,7 +127,7 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
     }
   };
 
-  const renderFooter = () => {
+  const renderFooter = useMemo(() => {
     if (!loadingMore) return null;
 
     return (
@@ -122,7 +145,11 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
         />
       </View>
     );
-  };
+  }, [loadingMore]);
+
+  const renderItem: ListRenderItem<NewsItem> = useCallback(({ item }) => {
+    return <NewsCard item={item} />;
+  }, []);
 
   if (loading) return <Loading />;
 
@@ -130,18 +157,7 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
     <FlatList
       data={news}
       keyExtractor={(item) => item.mal_id.toString()}
-      renderItem={({ item: n }) => (
-        <NewsWrapper>
-          <NewsCardImage source={n.images.jpg.image_url} />
-          <NewsInfosWrapper>
-            <NewsTitle numberOfLines={3}>{n.title}</NewsTitle>
-            <NewsDescription numberOfLines={6}>{n.excerpt}</NewsDescription>
-          </NewsInfosWrapper>
-          <NewsButton onPress={() => openUrl(n.forum_url)}>
-            <NewsButtonText>Ver notícia completa</NewsButtonText>
-          </NewsButton>
-        </NewsWrapper>
-      )}
+      renderItem={renderItem}
       showsHorizontalScrollIndicator={false}
       horizontal
       onEndReached={handleLoadMore}

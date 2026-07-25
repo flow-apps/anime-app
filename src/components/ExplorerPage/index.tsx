@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import { Keyboard, ScrollView, TouchableOpacity } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  Keyboard,
+  ListRenderItem,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { api } from "@/services/api";
@@ -47,6 +52,61 @@ const EmptyListComponent = React.memo(
     ),
 );
 
+interface ExplorerAnimeCardProps {
+  item: Anime;
+  onPress: (id: number) => void;
+}
+
+const ExplorerAnimeCard: React.FC<ExplorerAnimeCardProps> = React.memo(
+  ({ item, onPress }) => {
+    const handlePress = useCallback(() => {
+      onPress(item.mal_id);
+    }, [onPress, item.mal_id]);
+
+    return (
+      <TouchableOpacity
+        onPress={handlePress}
+        style={{
+          alignItems: "center",
+          margin: 20,
+        }}
+      >
+        <Image
+          width={150}
+          height={250}
+          marginBottom={10}
+          borderRadius={32}
+          objectFit="cover"
+          src={item.images.jpg.image_url}
+        />
+        <Text
+          fontFamily="$body"
+          fontWeight="$3"
+          textAlign="center"
+          color={"$textColor"}
+          maxWidth={100}
+          numberOfLines={2}
+          height={40}
+        >
+          {item.title_english || item.title}
+        </Text>
+        <View>
+          <Paragraph
+            textAlign="center"
+            fontFamily="$body"
+            fontWeight="$1"
+            color={"$grey"}
+          >
+            {item.year &&
+              item.duration &&
+              `${item.year} • ${item.episodes || 0} episódios`}
+          </Paragraph>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
+
 const ExplorerPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [searching, setSearching] = useState(false);
@@ -61,54 +121,56 @@ const ExplorerPage: React.FC = () => {
 
   const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
 
-  const fetchAnimes = async (
-    pageNum: number,
-    query?: string,
-    genre?: string | number,
-  ) => {
-    const isNewSearch = pageNum === 1;
-    if (isNewSearch) setSearching(true);
-    else setLoadingMore(true);
+  const fetchAnimes = useCallback(
+    async (pageNum: number, query?: string, genre?: string | number) => {
+      const isNewSearch = pageNum === 1;
+      if (isNewSearch) setSearching(true);
+      else setLoadingMore(true);
 
-    try {
-      const { data } = await api.get<AnimeSearchResponse>("/anime", {
-        params: {
-          page: pageNum,
-          limit: 24,
-          q: query,
-          genres: genre,
-          sfw: !adultContent,
-        },
-      });
+      try {
+        const { data } = await api.get<AnimeSearchResponse>("/anime", {
+          params: {
+            page: pageNum,
+            limit: 24,
+            q: query,
+            genres: genre,
+            sfw: !adultContent,
+          },
+        });
 
-      setSearchResults((prev) =>
-        isNewSearch ? data.data : [...prev, ...data.data],
-      );
+        setSearchResults((prev) =>
+          isNewSearch ? data.data : [...prev, ...data.data],
+        );
 
-      if (data.data.length === 0) {
-        setSearchInput("");
-        SimpleToast.show("Nenhum anime encontrado", SimpleToast.SHORT);
+        if (data.data.length === 0) {
+          setSearchInput("");
+          SimpleToast.show("Nenhum anime encontrado", SimpleToast.SHORT);
+        }
+
+        setHasMore(data.pagination.has_next_page);
+      } catch (error) {
+        console.error("Failed to fetch animes:", error);
+      } finally {
+        if (isNewSearch) setSearching(false);
+        else setLoadingMore(false);
       }
+    },
+    [adultContent],
+  );
 
-      setHasMore(data.pagination.has_next_page);
-    } catch (error) {
-      console.error("Failed to fetch animes:", error);
-    } finally {
-      if (isNewSearch) setSearching(false);
-      else setLoadingMore(false);
-    }
-  };
-
-  const handleSearch = (genre?: string | number, genreName?: string) => {
-    Keyboard.dismiss();
-    setPage(1);
-    setSearchResults([]);
-    const query = genre ? undefined : searchInput;
-    setCurrentQuery(query || "");
-    setCurrentGenre(genre);
-    if (genreName) setSearchInput(genreName);
-    fetchAnimes(1, query, genre);
-  };
+  const handleSearch = useCallback(
+    (genre?: string | number, genreName?: string) => {
+      Keyboard.dismiss();
+      setPage(1);
+      setSearchResults([]);
+      const query = genre ? undefined : searchInput;
+      setCurrentQuery(query || "");
+      setCurrentGenre(genre);
+      if (genreName) setSearchInput(genreName);
+      fetchAnimes(1, query, genre);
+    },
+    [fetchAnimes, searchInput],
+  );
 
   const handleClearSearch = () => {
     setSearchInput("");
@@ -118,12 +180,12 @@ const ExplorerPage: React.FC = () => {
     setPage(1);
   };
 
-  const handleOpenAnime = (id: string | number) => {
+  const handleOpenAnime = useCallback((id: string | number) => {
     router.navigate({
       pathname: "/anime/[id]",
       params: { id },
     });
-  };
+  }, []);
 
   const handleLoadMore = () => {
     if (!loadingMore && hasMore && searchResults.length > 0) {
@@ -133,7 +195,7 @@ const ExplorerPage: React.FC = () => {
     }
   };
 
-  const renderFooter = () => {
+  const renderFooter = useMemo(() => {
     if (!loadingMore) return null;
     return (
       <View paddingVertical={20} alignItems="center" justifyContent="center">
@@ -145,7 +207,21 @@ const ExplorerPage: React.FC = () => {
         />
       </View>
     );
-  };
+  }, [loadingMore]);
+
+  const onCategoryPress = useCallback(
+    (genre: GenreItem) => {
+      handleSearch(genre.mal_id, genre.name);
+    },
+    [handleSearch],
+  );
+
+  const renderItem: ListRenderItem<Anime> = useCallback(
+    ({ item }) => {
+      return <ExplorerAnimeCard item={item} onPress={handleOpenAnime} />;
+    },
+    [handleOpenAnime],
+  );
 
   return (
     <Container>
@@ -176,57 +252,20 @@ const ExplorerPage: React.FC = () => {
           alignItems: "center",
           width: "100%",
         }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleOpenAnime(item.mal_id)}
-            style={{
-              alignItems: "center",
-              margin: 20,
-            }}
-          >
-            <Image
-              width={150}
-              height={250}
-              marginBottom={10}
-              borderRadius={32}
-              objectFit="cover"
-              src={item.images.jpg.image_url}
-            />
-            <Text
-              fontFamily="$body"
-              fontWeight="$3"
-              textAlign="center"
-              color={"$textColor"}
-              maxWidth={100}
-              numberOfLines={2}
-              height={40}
-            >
-              {item.title_english || item.title}
-            </Text>
-            <View>
-              <Paragraph
-                textAlign="center"
-                fontFamily="$body"
-                fontWeight="$1"
-                color={"$grey"}
-              >
-                {item.year &&
-                  item.duration &&
-                  `${item.year} • ${item.episodes || 0} episódios`}
-              </Paragraph>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <EmptyListComponent
             searching={searching}
-            onCategoryPress={(genre) => handleSearch(genre.mal_id, genre.name)}
+            onCategoryPress={onCategoryPress}
           />
         }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
+        windowSize={10}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
       />
     </Container>
   );

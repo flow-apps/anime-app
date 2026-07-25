@@ -5,7 +5,7 @@ import { api } from "@/services/api";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View } from "tamagui";
 
 const SeasonNow: React.FC = () => {
@@ -16,28 +16,33 @@ const SeasonNow: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
 
-  const fetchSeasonNow = useCallback(async (pageNum: number) => {
-    const isFirstPage = pageNum === 1;
-    if (isFirstPage) setLoading(true);
-    else setLoadingMore(true);
-    try {
-      const { data } = await api.get<AnimeSearchResponse>(`/seasons/now`, {
-        params: {
-          page: pageNum,
-          limit: 15,
-          sfw: !adultContent,
-        },
-      });
-      setAnimes((prev) => (isFirstPage ? data.data : [...prev, ...data.data]));
-      setHasMore(data.pagination.has_next_page);
-      setPage(pageNum);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (isFirstPage) setLoading(false);
-      else setLoadingMore(false);
-    }
-  }, []);
+  const fetchSeasonNow = useCallback(
+    async (pageNum: number) => {
+      const isFirstPage = pageNum === 1;
+      if (isFirstPage) setLoading(true);
+      else setLoadingMore(true);
+      try {
+        const { data } = await api.get<AnimeSearchResponse>(`/seasons/now`, {
+          params: {
+            page: pageNum,
+            limit: 15,
+            sfw: !adultContent,
+          },
+        });
+        setAnimes((prev) =>
+          isFirstPage ? data.data : [...prev, ...data.data]
+        );
+        setHasMore(data.pagination.has_next_page);
+        setPage(pageNum);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (isFirstPage) setLoading(false);
+        else setLoadingMore(false);
+      }
+    },
+    [adultContent]
+  );
 
   useEffect(() => {
     fetchSeasonNow(1);
@@ -49,7 +54,7 @@ const SeasonNow: React.FC = () => {
     }
   };
 
-  const renderFooter = () => {
+  const renderFooter = useMemo(() => {
     if (!loadingMore) return null;
 
     return (
@@ -67,7 +72,26 @@ const SeasonNow: React.FC = () => {
         />
       </View>
     );
-  };
+  }, [loadingMore]);
+
+  const animesData = useMemo(() => {
+    return animes.map((a) => {
+      return {
+        name: a.title_english || a.title,
+        image_url: a.images.jpg.image_url,
+        duration: a.episodes,
+        release_date: a.year,
+        mal_id: a.mal_id,
+      };
+    });
+  }, [animes]);
+
+  const handlePress = useCallback((id: number) => {
+    router.navigate({
+      pathname: "/anime/[id]",
+      params: { id },
+    });
+  }, []);
 
   if (loading) {
     return <Loading />;
@@ -76,23 +100,10 @@ const SeasonNow: React.FC = () => {
   return (
     <HorizontalAnimeScroll
       title="Animes da Temporada"
-      onPress={(id: number) => {
-        router.navigate({
-          pathname: "/anime/[id]",
-          params: { id },
-        });
-      }}
+      onPress={handlePress}
       onEndReached={handleLoadMore}
-      ListFooterComponent={renderFooter()}
-      animes={animes.map((a) => {
-        return {
-          name: a.title_english || a.title,
-          image_url: a.images.jpg.image_url,
-          duration: a.episodes,
-          release_date: a.year,
-          mal_id: a.mal_id,
-        };
-      })}
+      ListFooterComponent={renderFooter}
+      animes={animesData}
     />
   );
 };
