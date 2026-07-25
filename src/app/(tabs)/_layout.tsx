@@ -38,8 +38,18 @@ export default function TabLayout() {
             downloadIfNeeded: true,
           }),
           FastTranslator.prepare({
+            source: "Portuguese",
+            target: "English",
+            downloadIfNeeded: true,
+          }),
+          FastTranslator.prepare({
             source: "Japanese",
             target: "Portuguese",
+            downloadIfNeeded: true,
+          }),
+          FastTranslator.prepare({
+            source: "Japanese",
+            target: "English",
             downloadIfNeeded: true,
           }),
         ]);

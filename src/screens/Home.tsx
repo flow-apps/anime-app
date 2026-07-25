@@ -97,7 +97,7 @@ const HomeScreen: React.FC = () => {
   }, [loadingMore.rec, hasMore.rec, recAnimesPage]);
 
   const renderFooter = (loading: boolean): ReactNode => {
-    if (!loading) return null;
+    if (!loading) return <></>;
 
     return (
       <LottieView

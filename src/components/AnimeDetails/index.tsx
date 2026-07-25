@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
 import { Text, useTheme } from "tamagui";
+import NewsSection from "../NewsSection";
 import {
   AnimeBanner,
   AnimeBannerContainer,
@@ -146,6 +147,9 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
             />
           </>
         )}
+
+        <AnimeTitle style={{ marginTop: 20 }}>Notícias</AnimeTitle>
+        <NewsSection animeId={anime.mal_id} />
       </AnimeInfosContainer>
     </AnimeDetailsContainer>
   );

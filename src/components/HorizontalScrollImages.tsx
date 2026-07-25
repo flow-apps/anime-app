@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, Paragraph, SizableText, Text, View } from "tamagui";
 
@@ -15,6 +15,7 @@ interface IHorizontalAnimeScrollProps {
   animes: IAnimesData[];
   onPress: (mal_id: number) => any;
   onEndReached?: () => void;
+  ListFooterComponent?: ReactNode;
 }
 
 const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
@@ -22,6 +23,7 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
   title,
   onPress,
   onEndReached,
+  ListFooterComponent,
 }) => {
   return (
     <View>
@@ -43,6 +45,7 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
         contentContainerStyle={{ paddingHorizontal: 10 }}
+        ListFooterComponent={ListFooterComponent}
         renderItem={({ item: anime }) => (
           <TouchableOpacity
             onPress={() => onPress(anime.mal_id)}
