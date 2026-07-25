@@ -7,45 +7,93 @@ import { AnimeEntry, RecommendationResponse } from "@/types";
 import { TopAnimeItem, TopResponse } from "@/types/top";
 import { shuffle } from "@/utils";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 const HomeScreen: React.FC = () => {
   const [animesRec, setAnimesRec] = useState<AnimeEntry[]>([]);
   const [topAnimes, setTopAnimes] = useState<TopAnimeItem[]>([]);
   const [sliderData, setSliderData] = useState<AnimeEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState({ top: false, rec: false });
 
-  useEffect(() => {
-    (async () => {
-      const { data, status } = await api.get<RecommendationResponse>(
-        "/recommendations/anime?page=1&limit=100",
-      );
+  const [topAnimesPage, setTopAnimesPage] = useState(1);
+  const [recAnimesPage, setRecAnimesPage] = useState(1);
 
-      if (status === 200) {
-        const animeEntries: AnimeEntry[] = data.data.flatMap((a) => a.entry);
+  const [hasMore, setHasMore] = useState({ top: true, rec: true });
 
+  const fetchInitialData = useCallback(async () => {
+    try {
+      const [recResponse, topResponse] = await Promise.all([
+        api.get<RecommendationResponse>("/recommendations/anime"),
+        api.get<TopResponse>("/top/anime"),
+      ]);
+
+      if (recResponse.status === 200) {
+        const animeEntries: AnimeEntry[] = recResponse.data.data.flatMap(
+          (a: any) => a.entry,
+        );
         setAnimesRec(shuffle(animeEntries));
+        setHasMore((prev) => ({
+          ...prev,
+          rec: recResponse.data.pagination.has_next_page,
+        }));
       }
-    })();
+
+      if (topResponse.status === 200) {
+        setTopAnimes(topResponse.data.data);
+        setHasMore((prev) => ({
+          ...prev,
+          top: topResponse.data.pagination.has_next_page,
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to fetch initial data", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const { data, status } = await api.get<TopResponse>(
-        "/top/anime?page=1&limit=50",
-      );
-
-      setTopAnimes(data.data);
-
-      setLoading(false);
-    })();
-  }, []);
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   useEffect(() => {
     const data = animesRec?.slice(0, 15);
-
     setSliderData(data);
   }, [animesRec]);
+
+  const loadMoreTopAnimes = useCallback(async () => {
+    if (loadingMore.top || !hasMore.top) return;
+
+    setLoadingMore((prev) => ({ ...prev, top: true }));
+    const nextPage = topAnimesPage + 1;
+    const { data, status } = await api.get<TopResponse>(
+      `/top/anime?page=${nextPage}`,
+    );
+    if (status === 200) {
+      setTopAnimes((prev) => [...prev, ...data.data]);
+      setTopAnimesPage(nextPage);
+      setHasMore((prev) => ({ ...prev, top: data.pagination.has_next_page }));
+    }
+    setLoadingMore((prev) => ({ ...prev, top: false }));
+  }, [loadingMore.top, hasMore.top, topAnimesPage]);
+
+  const loadMoreRecAnimes = useCallback(async () => {
+    if (loadingMore.rec || !hasMore.rec) return;
+
+    setLoadingMore((prev) => ({ ...prev, rec: true }));
+    const nextPage = recAnimesPage + 1;
+    const { data, status } = await api.get<RecommendationResponse>(
+      `/recommendations/anime?page=${nextPage}`,
+    );
+    if (status === 200) {
+      const newEntries = data.data.flatMap((a) => a.entry);
+      setAnimesRec((prev) => [...prev, ...newEntries]);
+      setRecAnimesPage(nextPage);
+      setHasMore((prev) => ({ ...prev, rec: data.pagination.has_next_page }));
+    }
+    setLoadingMore((prev) => ({ ...prev, rec: false }));
+  }, [loadingMore.rec, hasMore.rec, recAnimesPage]);
 
   if (loading) return <Loading />;
 
@@ -71,6 +119,7 @@ const HomeScreen: React.FC = () => {
             params: { id },
           });
         }}
+        onEndReached={loadMoreTopAnimes}
         animes={topAnimes.map((a) => {
           return {
             name: a.title_english || a.title,

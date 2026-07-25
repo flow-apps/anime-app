@@ -1,6 +1,6 @@
 import React from "react";
-import { TouchableOpacity } from "react-native";
-import { Image, Paragraph, ScrollView, SizableText, Text, View } from "tamagui";
+import { FlatList, TouchableOpacity } from "react-native";
+import { Image, Paragraph, SizableText, Text, View } from "tamagui";
 
 interface IAnimesData {
   mal_id: number;
@@ -14,31 +14,40 @@ interface IHorizontalAnimeScrollProps {
   title: string;
   animes: IAnimesData[];
   onPress: (mal_id: number) => any;
+  onEndReached?: () => void;
 }
 
 const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
   animes,
   title,
   onPress,
+  onEndReached,
 }) => {
   return (
-    <ScrollView nestedScrollEnabled>
+    <View>
       <SizableText
         fontSize={26}
         fontFamily="$heading"
         fontWeight="$4"
         color={"$textColor"}
         marginVertical={15}
+        paddingHorizontal={10}
       >
         {title}
       </SizableText>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {animes.map((anime, i) => (
+      <FlatList
+        data={animes}
+        keyExtractor={(item) => `${Math.random()}-${item.mal_id}`}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        contentContainerStyle={{ paddingHorizontal: 10 }}
+        renderItem={({ item: anime }) => (
           <TouchableOpacity
-            key={i}
             onPress={() => onPress(anime.mal_id)}
             style={{
-              marginRight: 25,
+              marginRight: 15,
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -61,22 +70,19 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
             >
               {anime.name}
             </Text>
-            <View>
-              <Paragraph
-                textAlign="center"
-                fontFamily="$body"
-                fontWeight="$1"
-                color={"$grey"}
-              >
-                {anime.release_date &&
-                  anime.duration &&
-                  `${anime.release_date} • ${anime.duration} episódios`}
-              </Paragraph>
-            </View>
+            <Paragraph
+              textAlign="center"
+              fontFamily="$body"
+              fontWeight="$1"
+              color={"$grey"}
+            >
+              {anime.release_date &&
+                `${anime.release_date} • ${anime.duration || 0} episódios`}
+            </Paragraph>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </ScrollView>
+        )}
+      />
+    </View>
   );
 };
 
