@@ -1,8 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  FlatList,
-  Image as RNImage,
-} from "react-native";
+import { FlatList, Image as RNImage } from "react-native";
 
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
@@ -65,15 +62,12 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
 
       try {
         const url = animeId ? `/anime/${animeId}/news` : `/news`;
-        const { data: responseData } = await api.get<NewsResponse>(
-          url,
-          {
-            params: {
-              page: pageNum,
-              limit: 10,
-            },
+        const { data: responseData } = await api.get<NewsResponse>(url, {
+          params: {
+            page: pageNum,
+            limit: 5,
           },
-        );
+        });
         const { data, pagination } = responseData;
         let newsData = data;
 
@@ -133,27 +127,27 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
   if (loading) return <Loading />;
 
   return (
-      <FlatList
-        data={news}
-        keyExtractor={(item) => item.mal_id.toString()}
-        renderItem={({ item: n }) => (
-          <NewsWrapper>
-            <NewsCardImage source={n.images.jpg.image_url} />
-            <NewsInfosWrapper>
-              <NewsTitle numberOfLines={3}>{n.title}</NewsTitle>
-              <NewsDescription numberOfLines={6}>{n.excerpt}</NewsDescription>
-            </NewsInfosWrapper>
-            <NewsButton onPress={() => openUrl(n.forum_url)}>
-              <NewsButtonText>Ver notícia completa</NewsButtonText>
-            </NewsButton>
-          </NewsWrapper>
-        )}
-        showsHorizontalScrollIndicator={false}
-        horizontal
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-      />
+    <FlatList
+      data={news}
+      keyExtractor={(item) => item.mal_id.toString()}
+      renderItem={({ item: n }) => (
+        <NewsWrapper>
+          <NewsCardImage source={n.images.jpg.image_url} />
+          <NewsInfosWrapper>
+            <NewsTitle numberOfLines={3}>{n.title}</NewsTitle>
+            <NewsDescription numberOfLines={6}>{n.excerpt}</NewsDescription>
+          </NewsInfosWrapper>
+          <NewsButton onPress={() => openUrl(n.forum_url)}>
+            <NewsButtonText>Ver notícia completa</NewsButtonText>
+          </NewsButton>
+        </NewsWrapper>
+      )}
+      showsHorizontalScrollIndicator={false}
+      horizontal
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter}
+    />
   );
 });
 

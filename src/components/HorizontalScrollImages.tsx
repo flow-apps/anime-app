@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, Paragraph, SizableText, Text, View } from "tamagui";
 
@@ -6,8 +6,8 @@ interface IAnimesData {
   mal_id: number;
   image_url: string;
   name: string;
-  release_date?: string | number;
-  duration?: number;
+  release_date?: string | number | null;
+  duration?: number | null;
 }
 
 interface IHorizontalAnimeScrollProps {
@@ -15,7 +15,7 @@ interface IHorizontalAnimeScrollProps {
   animes: IAnimesData[];
   onPress: (mal_id: number) => any;
   onEndReached?: () => void;
-  ListFooterComponent?: ReactNode;
+  ListFooterComponent?: any;
 }
 
 const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({

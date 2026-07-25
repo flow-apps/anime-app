@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  Keyboard,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { Keyboard, ScrollView, TouchableOpacity } from "react-native";
 
 import { api } from "@/services/api";
 import { GenreItem } from "@/types";
@@ -14,6 +10,7 @@ import LottieView from "lottie-react-native";
 import { Image, Paragraph, Text, View } from "tamagui";
 import Loading from "../Loading";
 import NewsSection from "../NewsSection";
+import SeasonNow from "../SeasonNow";
 import Categories from "./components/Categories";
 import {
   Container,
@@ -41,6 +38,7 @@ const EmptyListComponent = React.memo(
         <ScrollView>
           <ExplorerTitle>Notícias</ExplorerTitle>
           <NewsSection />
+          <SeasonNow />
         </ScrollView>
       </ExplorerContainer>
     ),
@@ -164,7 +162,6 @@ const ExplorerPage: React.FC = () => {
         contentContainerStyle={{
           alignItems: "center",
           width: "100%",
-          marginVertical: 20,
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
