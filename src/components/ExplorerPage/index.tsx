@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  Keyboard,
   Image as RNImage,
   ScrollView,
   TouchableOpacity,
@@ -142,42 +144,73 @@ const EmptyListComponent = React.memo(
 const ExplorerPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Anime[]>([]);
   const [searching, setSearching] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentQuery, setCurrentQuery] = useState("");
+  const [currentGenre, setCurrentGenre] = useState<
+    string | number | undefined
+  >();
 
-  useFocusEffect(() => {
-    setSearchInput("");
-    setSearchResults([]);
-  });
+  useFocusEffect(
+    useCallback(() => {
+      setSearchInput("");
+      setSearchResults([]);
+      setCurrentQuery("");
+      setCurrentGenre(undefined);
+      setPage(1);
+    }, []),
+  );
 
-  const handleSearch = async (genre?: string | number, genreName?: string) => {
-    setSearching(true);
+  const fetchAnimes = async (
+    pageNum: number,
+    query?: string,
+    genre?: string | number,
+  ) => {
+    const isNewSearch = pageNum === 1;
+    if (isNewSearch) setSearching(true);
+    else setLoadingMore(true);
 
-    let animeData: Anime[];
+    try {
+      const { data } = await api.get<AnimeSearchResponse>("/anime", {
+        params: {
+          page: pageNum,
+          limit: 24,
+          q: query,
+          genres: genre,
+        },
+      });
 
-    if (genre) {
-      const {
-        data: { data },
-      } = await api.get<AnimeSearchResponse>(`/anime?genres=${genre}&limit=50`);
-
-      setSearchInput(genreName!);
-      animeData = data;
-    } else {
-      const {
-        data: { data },
-      } = await api.get<AnimeSearchResponse>(
-        `/anime?q=${searchInput}&limit=20`,
+      setSearchResults((prev) =>
+        isNewSearch ? data.data : [...prev, ...data.data],
       );
-
-      animeData = data;
+      setHasMore(data.pagination.has_next_page);
+    } catch (error) {
+      console.error("Failed to fetch animes:", error);
+    } finally {
+      if (isNewSearch) setSearching(false);
+      else setLoadingMore(false);
     }
+  };
 
-    setSearchResults(animeData);
-    setSearching(false);
+  const handleSearch = (genre?: string | number, genreName?: string) => {
+    Keyboard.dismiss();
+    setPage(1);
+    setSearchResults([]);
+    const query = genre ? undefined : searchInput;
+    setCurrentQuery(query || "");
+    setCurrentGenre(genre);
+    if (genreName) setSearchInput(genreName);
+    fetchAnimes(1, query, genre);
   };
 
   const handleClearSearch = () => {
     setSearchInput("");
     setSearchResults([]);
+    setCurrentQuery("");
+    setCurrentGenre(undefined);
+    setPage(1);
   };
 
   const handleOpenAnime = (id: string | number) => {
@@ -187,6 +220,20 @@ const ExplorerPage: React.FC = () => {
     });
   };
 
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore && searchResults.length > 0) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchAnimes(nextPage, currentQuery, currentGenre);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    // Usando a View para adicionar um espaçamento e evitar que o indicador cole na borda
+    return <View paddingVertical={20}>{<ActivityIndicator />}</View>;
+  };
+
   return (
     <Container>
       <SearchContainer>
@@ -194,7 +241,7 @@ const ExplorerPage: React.FC = () => {
           value={searchInput}
           onChangeText={setSearchInput}
           placeholder="Pesquisar anime..."
-          disabled={!!searchResults.length}
+          onSubmitEditing={() => handleSearch()}
         />
         {!!searchResults.length && (
           <SearchButton onPress={handleClearSearch}>
@@ -267,6 +314,9 @@ const ExplorerPage: React.FC = () => {
             onCategoryPress={(genre) => handleSearch(genre.mal_id, genre.name)}
           />
         }
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
       />
     </Container>
   );
