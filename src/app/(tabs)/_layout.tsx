@@ -83,7 +83,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "AnimeApp",
+          title: "Bem-vindo",
           tabBarIcon: ({ color }) => (
             <Feather size={28} name="home" color={color} />
           ),
