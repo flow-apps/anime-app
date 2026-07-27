@@ -38,6 +38,7 @@ export default function StackLayout() {
                 colors={[`#0a121d`, "#0a121d09"]}
               />
             ),
+
             headerStyle: {
               backgroundColor: "transparent",
             },

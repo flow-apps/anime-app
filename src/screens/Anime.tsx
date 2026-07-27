@@ -4,8 +4,10 @@ import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
 import { api } from "@/services/api";
 import { TopAnimeItem } from "@/types/top";
+import Feather from "@react-native-vector-icons/feather";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native";
 
 interface IAnimeProps {
   id: string | number;
@@ -56,7 +58,14 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
   }, [updated]);
 
   useEffect(() => {
-    navigation.setOptions({ title: anime?.title_english });
+    navigation.setOptions({
+      title: anime?.title_english,
+      headerRight: () => (
+        <TouchableOpacity>
+          <Feather name="share-2" size={22} color={"#fff"} />
+        </TouchableOpacity>
+      ),
+    });
   }, [anime]);
 
   if (loading) return <Loading />;
