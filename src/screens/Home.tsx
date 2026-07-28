@@ -2,7 +2,7 @@ import { Container } from "@/components/Container";
 import HomeSlider from "@/components/HomeSlider";
 import HorizontalAnimeScroll from "@/components/HorizontalScrollImages";
 import Loading from "@/components/Loading";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { RootState } from "@/redux/store";
 import { api } from "@/services/api";
 import { AnimeEntry, RecommendationResponse } from "@/types";
 import { TopAnimeItem, TopResponse } from "@/types/top";
@@ -10,6 +10,7 @@ import { shuffle } from "@/utils";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const HomeScreen: React.FC = () => {
   const [animesRec, setAnimesRec] = useState<AnimeEntry[]>([]);
@@ -22,7 +23,7 @@ const HomeScreen: React.FC = () => {
   const [recAnimesPage, setRecAnimesPage] = useState(1);
 
   const [hasMore, setHasMore] = useState({ top: true, rec: true });
-  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
+  const { adult_content } = useSelector((state: RootState) => state.configs);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -73,7 +74,7 @@ const HomeScreen: React.FC = () => {
     const { data, status } = await api.get<TopResponse>(`/top/anime`, {
       params: {
         page: nextPage,
-        sfw: !adultContent,
+        sfw: !adult_content,
       },
     });
     if (status === 200) {
@@ -94,7 +95,7 @@ const HomeScreen: React.FC = () => {
       {
         params: {
           page: nextPage,
-          sfw: !adultContent,
+          sfw: !adult_content,
         },
       },
     );

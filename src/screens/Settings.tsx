@@ -1,47 +1,46 @@
 import { Container } from "@/components/Container";
 import SwitchInput from "@/components/SwitchInput";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { setConfig } from "@/redux/slices/configsSlice";
+import { RootState } from "@/redux/store";
 import React from "react";
-import { useColorScheme } from "react-native";
 import Toast from "react-native-simple-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const SettingsScreen: React.FC = () => {
-  const [themeName, setThemeName] = usePersistedState<"dark" | "light">(
-    "theme",
-    useColorScheme() as "dark" | "light",
+  const { theme_name, adult_content, translate_text } = useSelector(
+    (state: RootState) => state.configs,
   );
-  const [translate, setTranslate] = usePersistedState<boolean>(
-    "translate_text",
-    true,
-  );
-
-  const [adultContent, setAdultContent] = usePersistedState<boolean>(
-    "adult_content",
-    false,
-  );
+  const dispatch = useDispatch();
 
   return (
     <Container style={{ padding: 10 }}>
       <SwitchInput
         label="Modo Escuro"
-        currentValue={themeName === "dark"}
+        currentValue={theme_name === "dark"}
         onSwitch={(isDark: boolean) => {
-          setThemeName(isDark ? "dark" : "light");
+          dispatch(
+            setConfig({
+              configName: "theme_name",
+              value: isDark ? "dark" : "light",
+            }),
+          );
           Toast.show("Reinicie o app para aplicar", Toast.SHORT);
         }}
       />
       <SwitchInput
         label="Traduzir textos (experimental)"
-        currentValue={translate}
+        currentValue={translate_text}
         onSwitch={(translate: boolean) => {
-          setTranslate(translate);
+          dispatch(
+            setConfig({ configName: "translate_text", value: translate }),
+          );
         }}
       />
       <SwitchInput
         label="Exibir conteúdo adulto"
-        currentValue={adultContent}
+        currentValue={adult_content}
         onSwitch={(adult: boolean) => {
-          setAdultContent(adult);
+          dispatch(setConfig({ configName: "adult_content", value: adult }));
         }}
       />
     </Container>

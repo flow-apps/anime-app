@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList, Image as RNImage, ListRenderItem } from "react-native";
+import { FlatList, ListRenderItem, Image as RNImage } from "react-native";
 
-import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
+import { RootState } from "@/redux/store";
 import { api } from "@/services/api";
 import { NewsItem, NewsResponse } from "@/types";
 import { openUrl } from "@/utils";
 import LottieView from "lottie-react-native";
+import { useSelector } from "react-redux";
 import { View } from "tamagui";
 import Loading from "../Loading";
 import {
@@ -71,14 +72,12 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [translate, _, updated] = usePersistedState<boolean>(
-    "translate_text",
-    true,
+  const { translate_text, adult_content } = useSelector(
+    (state: RootState) => state.configs,
   );
 
   const fetchNews = useCallback(
     async (pageNum: number) => {
-      if (!updated) return;
       const isFirstPage = pageNum === 1;
       if (isFirstPage) setLoading(true);
       else setLoadingMore(true);
@@ -89,12 +88,13 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
           params: {
             page: pageNum,
             limit: 5,
+            sfw: !adult_content,
           },
         });
         const { data, pagination } = responseData;
         let newsData = data;
 
-        if (translate) {
+        if (translate_text) {
           newsData = await Promise.all(
             newsData.map(async (n) => {
               const [title, excerpt] = await Promise.all([
@@ -114,7 +114,7 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
         else setLoadingMore(false);
       }
     },
-    [updated, translate, translateText, animeId],
+    [translate_text, translateText, animeId],
   );
 
   useEffect(() => {

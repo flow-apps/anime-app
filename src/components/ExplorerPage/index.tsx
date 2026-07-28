@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { usePersistedState } from "@/hooks/usePersistedState";
 import { api } from "@/services/api";
 import { GenreItem } from "@/types";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
@@ -28,7 +27,9 @@ import {
   SearchInput,
 } from "./styles";
 
+import { RootState } from "@/redux/store";
 import SimpleToast from "react-native-simple-toast";
+import { useSelector } from "react-redux";
 
 const EmptyListComponent = React.memo(
   ({
@@ -119,7 +120,7 @@ const ExplorerPage: React.FC = () => {
     string | number | undefined
   >();
 
-  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
+  const { adult_content } = useSelector((state: RootState) => state.configs);
 
   const fetchAnimes = useCallback(
     async (pageNum: number, query?: string, genre?: string | number) => {
@@ -134,7 +135,7 @@ const ExplorerPage: React.FC = () => {
             limit: 24,
             q: query,
             genres: genre,
-            sfw: !adultContent,
+            sfw: !adult_content,
           },
         });
 
@@ -155,7 +156,7 @@ const ExplorerPage: React.FC = () => {
         else setLoadingMore(false);
       }
     },
-    [adultContent],
+    [],
   );
 
   const handleSearch = useCallback(

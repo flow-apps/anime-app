@@ -1,11 +1,12 @@
 import HorizontalAnimeScroll from "@/components/HorizontalScrollImages";
 import Loading from "@/components/Loading";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { RootState } from "@/redux/store";
 import { api } from "@/services/api";
 import { Anime, AnimeSearchResponse } from "@/types/anime";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { View } from "tamagui";
 
 const SeasonNow: React.FC = () => {
@@ -14,35 +15,30 @@ const SeasonNow: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [adultContent, _] = usePersistedState<boolean>("adult_content", false);
+  const { adult_content } = useSelector((state: RootState) => state.configs);
 
-  const fetchSeasonNow = useCallback(
-    async (pageNum: number) => {
-      const isFirstPage = pageNum === 1;
-      if (isFirstPage) setLoading(true);
-      else setLoadingMore(true);
-      try {
-        const { data } = await api.get<AnimeSearchResponse>(`/seasons/now`, {
-          params: {
-            page: pageNum,
-            limit: 15,
-            sfw: !adultContent,
-          },
-        });
-        setAnimes((prev) =>
-          isFirstPage ? data.data : [...prev, ...data.data]
-        );
-        setHasMore(data.pagination.has_next_page);
-        setPage(pageNum);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        if (isFirstPage) setLoading(false);
-        else setLoadingMore(false);
-      }
-    },
-    [adultContent]
-  );
+  const fetchSeasonNow = useCallback(async (pageNum: number) => {
+    const isFirstPage = pageNum === 1;
+    if (isFirstPage) setLoading(true);
+    else setLoadingMore(true);
+    try {
+      const { data } = await api.get<AnimeSearchResponse>(`/seasons/now`, {
+        params: {
+          page: pageNum,
+          limit: 15,
+          sfw: !adult_content,
+        },
+      });
+      setAnimes((prev) => (isFirstPage ? data.data : [...prev, ...data.data]));
+      setHasMore(data.pagination.has_next_page);
+      setPage(pageNum);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (isFirstPage) setLoading(false);
+      else setLoadingMore(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchSeasonNow(1);
