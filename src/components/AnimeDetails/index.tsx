@@ -2,7 +2,8 @@ import { usePersistedState } from "@/hooks/usePersistedState";
 import { TopAnimeItem } from "@/types/top";
 import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
-import React, { useState } from "react";
+import { AnimatePresence, MotiView } from "moti";
+import React, { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
 import { Text, useTheme } from "tamagui";
@@ -33,6 +34,18 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
     [],
   );
 
+  const [runAnimation, setRunAnimation] = useState(false);
+
+  useEffect(() => {
+    if (runAnimation) {
+      const timeout = setTimeout(() => {
+        setRunAnimation(false);
+      }, 600);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [runAnimation]);
+
   const { bg, red, shape } = useTheme();
 
   const handleTextLayout = (event: any) => {
@@ -46,6 +59,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
       setFavorites(favorites.filter((fav) => fav.mal_id !== anime.mal_id));
     } else {
       setFavorites([...favorites, anime]);
+      setRunAnimation(true);
     }
   };
 
@@ -86,7 +100,26 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
             style={{ backgroundColor: isFavorited ? red.val : shape.val }}
           >
             {isFavorited ? (
-              <FontAwesomeFreeSolid name="heart" color={"#fff"} size={20} />
+              <AnimatePresence>
+                <MotiView
+                  key="moti-heart"
+                  from={{
+                    scale: 0.5,
+                  }}
+                  animate={{
+                    scale: runAnimation ? [1.3, 1.0] : 1.0,
+                  }}
+                  transition={{
+                    type: "spring",
+                    duration: 150,
+                  }}
+                  exit={{
+                    scale: 0,
+                  }}
+                >
+                  <FontAwesomeFreeSolid name="heart" color={"#fff"} size={20} />
+                </MotiView>
+              </AnimatePresence>
             ) : (
               <Feather name="heart" color={red.val} size={20} />
             )}
