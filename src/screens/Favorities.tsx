@@ -1,13 +1,19 @@
+import {
+  SearchButton,
+  SearchContainer,
+  SearchInput,
+} from "@/components/ExplorerPage/styles";
 import Loading from "@/components/Loading";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { TopAnimeItem } from "@/types/top";
+import Feather from "@react-native-vector-icons/feather";
 import { router, useFocusEffect } from "expo-router";
 import { MotiView } from "moti";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, ListRenderItem, TouchableOpacity } from "react-native";
 import { Image, Paragraph, Text, View } from "tamagui";
 
-const EmptyList = React.memo(() => (
+const EmptyList = (searching?: boolean) => (
   <View alignItems="center" flex={1} justifyContent="center" padding={12}>
     <Text
       color={"$textColor"}
@@ -16,10 +22,12 @@ const EmptyList = React.memo(() => (
       fontSize={18}
       textAlign="center"
     >
-      Marque animes como favoritos para serem exibidos aqui
+      {searching
+        ? "Nenhum anime encontrado"
+        : "Marque animes como favoritos para serem exibidos aqui"}
     </Text>
   </View>
-));
+);
 
 interface FavoriteAnimeCardProps {
   item: TopAnimeItem;
@@ -91,6 +99,7 @@ const FavoritiesScreen: React.FC = () => {
   const [favorites, _, updated, reloadState] = usePersistedState<
     TopAnimeItem[]
   >("favorites", []);
+  const [searchInput, setSearchInput] = useState("");
 
   useFocusEffect(
     useCallback(() => {
@@ -113,6 +122,13 @@ const FavoritiesScreen: React.FC = () => {
     [favorites],
   );
 
+  const filteredFavorites = useMemo(() => {
+    return sortedFavorites.filter((anime) => {
+      const title = (anime.title_english || anime.title).toLowerCase();
+      return title.includes(searchInput.toLowerCase());
+    });
+  }, [sortedFavorites, searchInput]);
+
   const renderItem: ListRenderItem<TopAnimeItem> = useCallback(
     ({ item }) => {
       return <FavoriteAnimeCard item={item} onPress={handleOpenAnime} />;
@@ -123,9 +139,21 @@ const FavoritiesScreen: React.FC = () => {
   if (!updated) return <Loading />;
 
   return (
-    <View flex={1} backgroundColor="$bg" alignItems="center">
+    <View flex={1} backgroundColor="$bg" alignItems="center" padding={12}>
+      <SearchContainer>
+        <SearchInput
+          value={searchInput}
+          onChangeText={setSearchInput}
+          placeholder="Pesquisar favoritos..."
+        />
+        {searchInput.length > 0 && (
+          <SearchButton onPress={() => setSearchInput("")}>
+            <Feather name="x" color={"#fff"} size={16} />
+          </SearchButton>
+        )}
+      </SearchContainer>
       <FlatList
-        data={sortedFavorites}
+        data={filteredFavorites}
         keyExtractor={({ mal_id }) => mal_id.toString()}
         numColumns={2}
         contentContainerStyle={{
@@ -136,7 +164,7 @@ const FavoritiesScreen: React.FC = () => {
         }}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<EmptyList />}
+        ListEmptyComponent={EmptyList(!!searchInput.length)}
         windowSize={10}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
