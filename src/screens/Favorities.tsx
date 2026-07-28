@@ -84,9 +84,11 @@ const FavoriteAnimeCard: React.FC<FavoriteAnimeCardProps> = React.memo(
               fontWeight="$1"
               color={"$grey"}
             >
-              {item.year &&
-                item.duration &&
-                `${item.year} • ${item.episodes || 0} episódios`}
+              {item.year || "Não lançado"}
+              {" • "}
+              {item.type == "Movie"
+                ? "Filme"
+                : `${item.episodes || 0} episódios`}
             </Paragraph>
           </View>
         </TouchableOpacity>

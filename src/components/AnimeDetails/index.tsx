@@ -3,7 +3,7 @@ import { TopAnimeItem } from "@/types/top";
 import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
 import { AnimatePresence, MotiView } from "moti";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
 import { Text, useTheme } from "tamagui";
@@ -35,6 +35,14 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
   );
 
   const [runAnimation, setRunAnimation] = useState(false);
+
+  const isUpcoming = useMemo(() => {
+    if (anime.year) return false;
+
+    if (anime.aired.from !== null || anime.episodes > 0) return false;
+
+    return true;
+  }, [anime]);
 
   useEffect(() => {
     if (runAnimation) {
@@ -73,12 +81,14 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
           {anime.title_english || anime.title}
         </AnimeTitle>
         <AnimeInfosWrapper>
-          <AnimeInfos>{`${anime.year}  |  ${anime.genres.map((a) => a.name).join(", ")}`}</AnimeInfos>
+          <AnimeInfos>{`${!isUpcoming ? anime.year : "Não lançado"}  |  ${anime.genres.map((a) => a.name).join(", ")}`}</AnimeInfos>
         </AnimeInfosWrapper>
-        <AnimeInfos style={{ marginTop: 5 }}>
-          <FontAwesomeFreeSolid name="star" size={12} color={"#ffd000"} />{" "}
-          {anime.score}
-        </AnimeInfos>
+        {!!anime.score && (
+          <AnimeInfos style={{ marginTop: 5 }}>
+            <FontAwesomeFreeSolid name="star" size={12} color={"#ffd000"} />{" "}
+            {anime.score}
+          </AnimeInfos>
+        )}
         {!canExpand ? (
           <Text
             onTextLayout={handleTextLayout}

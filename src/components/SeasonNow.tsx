@@ -78,6 +78,7 @@ const SeasonNow: React.FC = () => {
         duration: a.episodes,
         release_date: a.year,
         mal_id: a.mal_id,
+        type: a.type,
       };
     });
   }, [animes]);

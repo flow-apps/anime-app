@@ -9,6 +9,7 @@ interface IAnimesData {
   name: string;
   release_date?: string | number | null;
   duration?: number | null;
+  type?: string;
 }
 
 interface IHorizontalAnimeScrollProps {
@@ -65,8 +66,9 @@ const AnimeCard: React.FC<IAnimeCardProps> = React.memo(
           fontWeight="$1"
           color={"$grey"}
         >
-          {anime.release_date &&
-            `${anime.release_date} • ${anime.duration || 0} episódios`}
+          {anime.release_date || "Não lançado"}
+          {" • "}
+          {anime.type == "Movie" ? "Filme" : `${anime.duration || 0} episódios`}
         </Paragraph>
       </TouchableOpacity>
     );
