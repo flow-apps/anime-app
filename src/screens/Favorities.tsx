@@ -2,9 +2,10 @@ import Loading from "@/components/Loading";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { TopAnimeItem } from "@/types/top";
 import { router, useFocusEffect } from "expo-router";
+import { MotiView } from "moti";
 import React, { useCallback, useMemo } from "react";
 import { FlatList, ListRenderItem, TouchableOpacity } from "react-native";
-import { Image, Paragraph, Text, useTheme, View } from "tamagui";
+import { Image, Paragraph, Text, View } from "tamagui";
 
 const EmptyList = React.memo(() => (
   <View alignItems="center" flex={1} justifyContent="center" padding={12}>
@@ -32,47 +33,56 @@ const FavoriteAnimeCard: React.FC<FavoriteAnimeCardProps> = React.memo(
     }, [onPress, item.mal_id]);
 
     return (
-      <TouchableOpacity
-        onPress={handlePress}
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: 20,
-          marginHorizontal: 10,
+      <MotiView
+        from={{ opacity: 0, scale: 0.3 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          type: "timing",
+          duration: 350,
         }}
       >
-        <Image
-          width={150}
-          height={250}
-          marginBottom={10}
-          borderRadius={32}
-          objectFit="cover"
-          src={item.images.jpg.image_url}
-        />
-        <Text
-          fontFamily="$body"
-          fontWeight="$3"
-          textAlign="center"
-          color={"$textColor"}
-          maxWidth={100}
-          numberOfLines={2}
-          height={40}
+        <TouchableOpacity
+          onPress={handlePress}
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 20,
+            marginHorizontal: 10,
+          }}
         >
-          {item.title_english || item.title}
-        </Text>
-        <View>
-          <Paragraph
-            textAlign="center"
+          <Image
+            width={150}
+            height={250}
+            marginBottom={10}
+            borderRadius={32}
+            objectFit="cover"
+            src={item.images.jpg.image_url}
+          />
+          <Text
             fontFamily="$body"
-            fontWeight="$1"
-            color={"$grey"}
+            fontWeight="$3"
+            textAlign="center"
+            color={"$textColor"}
+            maxWidth={100}
+            numberOfLines={2}
+            height={40}
           >
-            {item.year &&
-              item.duration &&
-              `${item.year} • ${item.episodes || 0} episódios`}
-          </Paragraph>
-        </View>
-      </TouchableOpacity>
+            {item.title_english || item.title}
+          </Text>
+          <View>
+            <Paragraph
+              textAlign="center"
+              fontFamily="$body"
+              fontWeight="$1"
+              color={"$grey"}
+            >
+              {item.year &&
+                item.duration &&
+                `${item.year} • ${item.episodes || 0} episódios`}
+            </Paragraph>
+          </View>
+        </TouchableOpacity>
+      </MotiView>
     );
   },
 );

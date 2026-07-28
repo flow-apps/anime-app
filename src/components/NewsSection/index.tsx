@@ -7,6 +7,7 @@ import { api } from "@/services/api";
 import { NewsItem, NewsResponse } from "@/types";
 import { openUrl } from "@/utils";
 import LottieView from "lottie-react-native";
+import { MotiView } from "moti";
 import { useSelector } from "react-redux";
 import { View } from "tamagui";
 import Loading from "../Loading";
@@ -148,7 +149,18 @@ const NewsSection: React.FC<NewsSectionProps> = React.memo(({ animeId }) => {
   }, [loadingMore]);
 
   const renderItem: ListRenderItem<NewsItem> = useCallback(({ item }) => {
-    return <NewsCard item={item} />;
+    return (
+      <MotiView
+        from={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          type: "timing",
+          duration: 350,
+        }}
+      >
+        <NewsCard item={item} />
+      </MotiView>
+    );
   }, []);
 
   if (loading) return <Loading />;

@@ -1,6 +1,7 @@
+import { MotiView } from "moti";
 import React, { useCallback } from "react";
 import { FlatList, ListRenderItem, TouchableOpacity } from "react-native";
-import { Image, Paragraph, SizableText, Text, View } from "tamagui";
+import { Image, Paragraph, SizableText, Text } from "tamagui";
 
 interface IAnimesData {
   mal_id: number;
@@ -54,6 +55,7 @@ const AnimeCard: React.FC<IAnimeCardProps> = React.memo(
           color={"$textColor"}
           maxWidth={150}
           numberOfLines={2}
+          height={40}
         >
           {anime.name}
         </Text>
@@ -86,7 +88,7 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
   );
 
   return (
-    <View>
+    <>
       <SizableText
         fontSize={26}
         fontFamily="$heading"
@@ -97,21 +99,30 @@ const HorizontalAnimeScroll: React.FC<IHorizontalAnimeScrollProps> = ({
       >
         {title}
       </SizableText>
-      <FlatList
-        data={animes}
-        keyExtractor={(item) => `${item.mal_id.toString()}-${Math.random()}`}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.5}
-        contentContainerStyle={{ paddingHorizontal: 10 }}
-        ListFooterComponent={ListFooterComponent}
-        renderItem={renderItem}
-        windowSize={5}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-      />
-    </View>
+      <MotiView
+        from={{ opacity: 0, translateX: -50 }}
+        animate={{ opacity: 1, translateX: 0 }}
+        transition={{
+          type: "spring",
+          duration: 350,
+        }}
+      >
+        <FlatList
+          data={animes}
+          keyExtractor={(item) => `${item.mal_id.toString()}-${Math.random()}`}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.5}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
+          ListFooterComponent={ListFooterComponent}
+          renderItem={renderItem}
+          windowSize={5}
+          initialNumToRender={5}
+          maxToRenderPerBatch={5}
+        />
+      </MotiView>
+    </>
   );
 };
 
