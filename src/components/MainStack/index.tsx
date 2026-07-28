@@ -1,11 +1,10 @@
-
-import { ConfigState } from "@/redux/slices/configsSlice";
+import { RootState } from "@/redux/store";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { useSelector } from "react-redux";
 
 export const MainStack = () => {
-  const { theme_name } = useSelector((state: ConfigState) => state);
+  const { theme_name } = useSelector((state: RootState) => state.configs);
 
   return (
     <Stack

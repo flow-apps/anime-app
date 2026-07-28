@@ -3,7 +3,6 @@ import SwitchInput from "@/components/SwitchInput";
 import { setConfig } from "@/redux/slices/configsSlice";
 import { RootState } from "@/redux/store";
 import React from "react";
-import Toast from "react-native-simple-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 const SettingsScreen: React.FC = () => {
@@ -24,7 +23,6 @@ const SettingsScreen: React.FC = () => {
               value: isDark ? "dark" : "light",
             }),
           );
-          Toast.show("Reinicie o app para aplicar", Toast.SHORT);
         }}
       />
       <SwitchInput

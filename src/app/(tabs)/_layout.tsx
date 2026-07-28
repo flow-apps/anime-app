@@ -1,4 +1,4 @@
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { RootState } from "@/redux/store";
 import {
   Fredoka_300Light,
   Fredoka_400Regular,
@@ -9,16 +9,13 @@ import Feather from "@react-native-vector-icons/feather";
 import { SplashScreen, Tabs } from "expo-router";
 import FastTranslator from "fast-mlkit-translate-text";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { useSelector } from "react-redux";
 import { useTheme } from "tamagui";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
-  const [theme, setTheme] = usePersistedState<"light" | "dark">(
-    "theme",
-    useColorScheme() as "dark" | "light",
-  );
+  const { theme_name } = useSelector((state: RootState) => state.configs);
 
   const { bg, shape, textColor } = useTheme();
 
@@ -66,10 +63,10 @@ export default function TabLayout() {
         tabBarActiveTintColor: "#e63945",
         tabBarInactiveTintColor: textColor.val,
         headerStyle: {
-          backgroundColor: theme === "light" ? "#fff" : "#0a121d",
+          backgroundColor: theme_name === "light" ? "#fff" : "#0a121d",
         },
         headerTitleStyle: {
-          color: theme === "light" ? "#000" : "#fff",
+          color: theme_name === "light" ? "#000" : "#fff",
           fontFamily: "Fredoka_400Regular",
         },
         tabBarStyle: {
