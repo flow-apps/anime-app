@@ -64,6 +64,25 @@ const ExplorerAnimeCard: React.FC<ExplorerAnimeCardProps> = React.memo(
       onPress(item.mal_id);
     }, [onPress, item.mal_id]);
 
+    const isUpcoming = useMemo(() => {
+      if (item.year) return false;
+      if (item.aired.from !== null) return false;
+
+      return true;
+    }, [item]);
+
+    const animeReleaseYear = useMemo(() => {
+      if (isUpcoming) return null;
+
+      if (item.aired.from) {
+        const date = new Date(item.aired.from);
+
+        return date.getFullYear();
+      }
+
+      return item.year;
+    }, [isUpcoming, item]);
+
     return (
       <TouchableOpacity
         onPress={handlePress}
@@ -98,7 +117,7 @@ const ExplorerAnimeCard: React.FC<ExplorerAnimeCardProps> = React.memo(
             fontWeight="$1"
             color={"$grey"}
           >
-            {item.year || "Não lançado"}
+            {animeReleaseYear ? animeReleaseYear : "N/A"}
             {" • "}
             {item.type == "Movie" ? "Filme" : `${item.episodes || 0} episódios`}
           </Paragraph>
@@ -144,7 +163,6 @@ const ExplorerPage: React.FC = () => {
         );
 
         if (data.data.length === 0) {
-          setSearchInput("");
           SimpleToast.show("Nenhum anime encontrado", SimpleToast.SHORT);
         }
 
@@ -156,7 +174,7 @@ const ExplorerPage: React.FC = () => {
         else setLoadingMore(false);
       }
     },
-    [],
+    [adult_content],
   );
 
   const handleSearch = useCallback(

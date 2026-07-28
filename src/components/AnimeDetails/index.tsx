@@ -38,11 +38,22 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
 
   const isUpcoming = useMemo(() => {
     if (anime.year) return false;
-
-    if (anime.aired.from !== null || anime.episodes > 0) return false;
+    if (anime.aired.from !== null) return false;
 
     return true;
   }, [anime]);
+
+  const animeReleaseYear = useMemo(() => {
+    if (isUpcoming) return null;
+
+    if (anime.aired.from) {
+      const date = new Date(anime.aired.from);
+
+      return date.getFullYear();
+    }
+
+    return anime.year;
+  }, [isUpcoming, anime]);
 
   useEffect(() => {
     if (runAnimation) {
@@ -81,7 +92,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
           {anime.title_english || anime.title}
         </AnimeTitle>
         <AnimeInfosWrapper>
-          <AnimeInfos>{`${!isUpcoming ? anime.year : "Não lançado"}  |  ${anime.genres.map((a) => a.name).join(", ")}`}</AnimeInfos>
+          <AnimeInfos>{`${animeReleaseYear ? animeReleaseYear : "N/A"}  |  ${anime.genres.map((a) => a.name).join(", ")}`}</AnimeInfos>
         </AnimeInfosWrapper>
         {!!anime.score && (
           <AnimeInfos style={{ marginTop: 5 }}>

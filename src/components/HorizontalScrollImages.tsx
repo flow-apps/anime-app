@@ -66,7 +66,7 @@ const AnimeCard: React.FC<IAnimeCardProps> = React.memo(
           fontWeight="$1"
           color={"$grey"}
         >
-          {anime.release_date || "Não lançado"}
+          {anime.release_date || "N/A"}
           {" • "}
           {anime.type == "Movie" ? "Filme" : `${anime.duration || 0} episódios`}
         </Paragraph>

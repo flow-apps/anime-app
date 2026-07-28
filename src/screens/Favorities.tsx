@@ -40,6 +40,25 @@ const FavoriteAnimeCard: React.FC<FavoriteAnimeCardProps> = React.memo(
       onPress(item.mal_id);
     }, [onPress, item.mal_id]);
 
+    const isUpcoming = useMemo(() => {
+      if (item.year) return false;
+      if (item.aired.from !== null) return false;
+
+      return true;
+    }, [item]);
+
+    const animeReleaseYear = useMemo(() => {
+      if (isUpcoming) return null;
+
+      if (item.aired.from) {
+        const date = new Date(item.aired.from);
+
+        return date.getFullYear();
+      }
+
+      return item.year;
+    }, [isUpcoming, item]);
+
     return (
       <MotiView
         from={{ opacity: 0, scale: 0.3 }}
@@ -84,7 +103,7 @@ const FavoriteAnimeCard: React.FC<FavoriteAnimeCardProps> = React.memo(
               fontWeight="$1"
               color={"$grey"}
             >
-              {item.year || "Não lançado"}
+              {animeReleaseYear || "N/A"}
               {" • "}
               {item.type == "Movie"
                 ? "Filme"
