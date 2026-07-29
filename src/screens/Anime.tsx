@@ -77,7 +77,7 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
     navigation.setOptions({
       title: anime?.title_english,
       headerRight: () => (
-        <TouchableOpacity onPress={handleShare}>
+        <TouchableOpacity onPress={handleShare} style={{ marginLeft: 10 }}>
           <Feather name="share-2" size={22} color={"#fff"} />
         </TouchableOpacity>
       ),
