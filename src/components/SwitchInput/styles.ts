@@ -1,7 +1,6 @@
 import { Label, styled, View } from "tamagui";
 
 export const Container = styled(View, {
-  paddingHorizontal: 15,
   justifyContent: "space-between",
   alignItems: "center",
   flexDirection: "row",

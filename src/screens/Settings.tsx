@@ -3,16 +3,27 @@ import SwitchInput from "@/components/SwitchInput";
 import { setConfig } from "@/redux/slices/configsSlice";
 import { RootState } from "@/redux/store";
 import React from "react";
+import { Linking, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { SizableText } from "tamagui";
 
 const SettingsScreen: React.FC = () => {
   const { theme_name, adult_content, translate_text } = useSelector(
     (state: RootState) => state.configs,
   );
   const dispatch = useDispatch();
+  const handlePrivacy = async () => {
+    const canOpen = await Linking.canOpenURL(
+      process.env.EXPO_PUBLIC_PRIVACY_URL!,
+    );
+
+    if (canOpen) {
+      await Linking.openURL(process.env.EXPO_PUBLIC_PRIVACY_URL!);
+    }
+  };
 
   return (
-    <Container style={{ padding: 10 }}>
+    <Container style={{ padding: 10, paddingHorizontal: 25 }}>
       <SwitchInput
         label="Modo Escuro"
         currentValue={theme_name === "dark"}
@@ -41,6 +52,17 @@ const SettingsScreen: React.FC = () => {
           dispatch(setConfig({ configName: "adult_content", value: adult }));
         }}
       />
+      <TouchableOpacity onPress={handlePrivacy}>
+        <SizableText
+          color={"$textColor"}
+          fontFamily="$body"
+          fontWeight="$2"
+          fontSize={16}
+          marginVertical={10}
+        >
+          Políticas de Privacidade
+        </SizableText>
+      </TouchableOpacity>
     </Container>
   );
 };
