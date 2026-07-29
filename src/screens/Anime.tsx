@@ -7,7 +7,7 @@ import { TopAnimeItem } from "@/types/top";
 import Feather from "@react-native-vector-icons/feather";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { Share, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 
 interface IAnimeProps {
@@ -55,11 +55,29 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
     })();
   }, []);
 
+  const handleShare = async () => {
+    try {
+      const deepLink = `https://tsukiplay.vercel.app/anime/${anime?.mal_id}`;
+      const result = await Share.share({
+        title: `Compartilhar ${anime?.title_english || anime?.title}`,
+        message: `Confira este anime incrível no TsukiPlay: ${anime?.title_english || anime?.title}\n${deepLink}`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        console.log(`Anime compartilhado com sucesso.`);
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Compartilhamento cancelado.");
+      }
+    } catch (error: any) {
+      console.error("Erro ao compartilhar anime:", error.message);
+    }
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: anime?.title_english,
       headerRight: () => (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleShare}>
           <Feather name="share-2" size={22} color={"#fff"} />
         </TouchableOpacity>
       ),

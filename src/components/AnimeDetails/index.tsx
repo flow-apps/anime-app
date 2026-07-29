@@ -2,6 +2,7 @@ import { usePersistedState } from "@/hooks/usePersistedState";
 import { TopAnimeItem } from "@/types/top";
 import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
+import { useNavigation } from "expo-router";
 import { AnimatePresence, MotiView } from "moti";
 import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity } from "react-native";
@@ -35,6 +36,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
   );
 
   const [runAnimation, setRunAnimation] = useState(false);
+  const navigation = useNavigation();
 
   const isUpcoming = useMemo(() => {
     if (anime.year) return false;
