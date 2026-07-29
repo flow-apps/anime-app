@@ -60,7 +60,7 @@ const AnimeScreen: React.FC<IAnimeProps> = ({ id }) => {
       const deepLink = `https://tsukiplay.vercel.app/anime/${anime?.mal_id}`;
       const result = await Share.share({
         title: `Compartilhar ${anime?.title_english || anime?.title}`,
-        message: `Confira este anime incrível no TsukiPlay: ${anime?.title_english || anime?.title}\n${deepLink}`,
+        message: `Prepare-se para uma jornada épica! Confira '${anime?.title_english || anime?.title}' no TsukiPlay e descubra seu próximo anime favorito.\n${deepLink}`,
       });
 
       if (result.action === Share.sharedAction) {

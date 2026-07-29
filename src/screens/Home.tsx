@@ -149,11 +149,30 @@ const HomeScreen: React.FC = () => {
         onEndReached={loadMoreTopAnimes}
         ListFooterComponent={renderFooter(loadingMore.top)}
         animes={topAnimes.map((a) => {
+          const isUpcoming = () => {
+            if (a.year) return false;
+            if (a.aired.from !== null) return false;
+
+            return true;
+          };
+
+          const animeReleaseYear = () => {
+            if (isUpcoming()) return null;
+
+            if (a.aired.from) {
+              const date = new Date(a.aired.from);
+
+              return date.getFullYear();
+            }
+
+            return a.year;
+          };
+
           return {
             name: a.title_english || a.title,
             image_url: a.images.jpg.image_url,
             duration: a.episodes,
-            release_date: a.year,
+            release_date: animeReleaseYear(),
             mal_id: a.mal_id,
           };
         })}
