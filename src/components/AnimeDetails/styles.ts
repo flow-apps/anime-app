@@ -47,11 +47,11 @@ export const AnimeSynopsisFade = styled(LinearGradient, {
 });
 
 export const AnimeFavoriteButtonContainer = styled(View, {
-  flexDirection: "row",
+  flexDirection: "row-reverse",
   position: "absolute",
   right: 0,
   top: -55,
-  marginHorizontal: 15,
+  marginHorizontal: 5,
 });
 export const AnimeFavoriteButton = styled(TouchableOpacity, {
   width: 60,
@@ -60,4 +60,5 @@ export const AnimeFavoriteButton = styled(TouchableOpacity, {
   borderRadius: "50%",
   alignItems: "center",
   justifyContent: "center",
+  marginHorizontal: 5,
 });

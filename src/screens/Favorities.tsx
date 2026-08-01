@@ -5,13 +5,16 @@ import {
 } from "@/components/ExplorerPage/styles";
 import Loading from "@/components/Loading";
 import { usePersistedState } from "@/hooks/usePersistedState";
+import { schedulePushNotification } from "@/services/notifications";
 import { TopAnimeItem } from "@/types/top";
 import Feather from "@react-native-vector-icons/feather";
 import { router, useFocusEffect } from "expo-router";
 import { MotiView } from "moti";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, ListRenderItem, TouchableOpacity } from "react-native";
-import { Image, Paragraph, Text, View } from "tamagui";
+import { Button, Image, Paragraph, Text, View } from "tamagui";
+
+import * as Notifications from "expo-notifications";
 
 const EmptyList = (searching?: boolean) => (
   <View alignItems="center" flex={1} justifyContent="center" padding={12}>
@@ -160,12 +163,46 @@ const FavoritiesScreen: React.FC = () => {
   if (!updated) return <Loading />;
 
   return (
-    <View flex={1} backgroundColor="$bg" alignItems="center" padding={12}>
+    <View
+      flex={1}
+      backgroundColor="$bg"
+      alignItems="center"
+      padding={12}
+      paddingTop={20}
+    >
+      {__DEV__ && (
+        <Button
+          onPress={async () => {
+            try {
+              await schedulePushNotification({
+                title: "Teste de Notificação",
+                body: "Novo episódio disponível! Toque para ver.",
+                trigger: {
+                  seconds: 5,
+                  type: Notifications.SchedulableTriggerInputTypes
+                    .TIME_INTERVAL,
+                },
+                data: {
+                  animeId: 52991, // ID de um anime em lançamento (ex: Frieren)
+                },
+              });
+              alert("Notificação de teste agendada para daqui a 5 segundos!");
+            } catch (e) {
+              alert("Falha ao agendar notificação.");
+              console.error(e);
+            }
+          }}
+          marginBottom={10}
+        >
+          Testar Notificação (5s)
+        </Button>
+      )}
       <SearchContainer>
         <SearchInput
           value={searchInput}
           onChangeText={setSearchInput}
           placeholder="Pesquisar favoritos..."
+          placeholderTextColor="$grey"
         />
         {searchInput.length > 0 && (
           <SearchButton onPress={() => setSearchInput("")}>

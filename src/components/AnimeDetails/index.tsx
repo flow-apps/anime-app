@@ -1,11 +1,15 @@
 import { usePersistedState } from "@/hooks/usePersistedState";
+import { schedulePushNotification } from "@/services/notifications";
+import { IAnimeNotification } from "@/types";
 import { TopAnimeItem } from "@/types/top";
+import { convertBroadcastToDate, convertTZ } from "@/utils/date";
 import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
-import { useNavigation } from "expo-router";
+import { useCalendars } from "expo-localization";
+import * as Notifications from "expo-notifications";
 import { AnimatePresence, MotiView } from "moti";
 import React, { useEffect, useMemo, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { ActivityIndicator, TouchableOpacity } from "react-native";
 import { WebView } from "react-native-webview";
 import { Text, useTheme } from "tamagui";
 import NewsSection from "../NewsSection";
@@ -35,8 +39,16 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
     [],
   );
 
-  const [runAnimation, setRunAnimation] = useState(false);
-  const navigation = useNavigation();
+  const [animesNotifications, setAnimeNotifications] = usePersistedState<
+    IAnimeNotification[]
+  >("anime_notifications", []);
+
+  const [runFavAnimation, setRunFavAnimation] = useState(false);
+  const [runNotifyAnimation, setRunNotifyAnimation] = useState(false);
+  const [isNotifying, setIsNotifying] = useState(false);
+  const {
+    "0": { timeZone },
+  } = useCalendars();
 
   const isUpcoming = useMemo(() => {
     if (anime.year) return false;
@@ -58,29 +70,99 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
   }, [isUpcoming, anime]);
 
   useEffect(() => {
-    if (runAnimation) {
+    if (runFavAnimation) {
       const timeout = setTimeout(() => {
-        setRunAnimation(false);
+        setRunFavAnimation(false);
       }, 600);
 
       return () => clearTimeout(timeout);
     }
-  }, [runAnimation]);
+  }, [runFavAnimation]);
 
-  const { bg, red, shape } = useTheme();
+  useEffect(() => {
+    if (runNotifyAnimation) {
+      const timeout = setTimeout(() => {
+        setRunNotifyAnimation(false);
+      }, 600);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [runNotifyAnimation]);
+
+  const { bg, red, shape, textColor } = useTheme();
 
   const handleTextLayout = (event: any) => {
     setCanExpand(event.nativeEvent.lines.length > 3);
   };
 
   const isFavorited = favorites.some((fav) => fav.mal_id === anime.mal_id);
+  const isNotify = animesNotifications.some(
+    (not) => not.anime.mal_id === anime.mal_id,
+  );
 
   const handleFavorite = () => {
     if (isFavorited) {
       setFavorites(favorites.filter((fav) => fav.mal_id !== anime.mal_id));
     } else {
       setFavorites([...favorites, anime]);
-      setRunAnimation(true);
+      setRunFavAnimation(true);
+    }
+  };
+
+  const handleNotify = async () => {
+    if (isNotifying) return;
+
+    setIsNotifying(true);
+    try {
+      if (isNotify) {
+        const notificationToCancel = animesNotifications.find(
+          (not) => not.anime.mal_id === anime.mal_id,
+        );
+
+        if (notificationToCancel) {
+          await Notifications.cancelScheduledNotificationAsync(
+            notificationToCancel.identifier,
+          );
+        }
+        setAnimeNotifications(
+          animesNotifications.filter(
+            (not) => not.anime.mal_id !== anime.mal_id,
+          ),
+        );
+      } else {
+        const convertedDate = convertTZ(
+          convertBroadcastToDate(anime.broadcast),
+          anime.broadcast.timezone,
+          timeZone || "America/Sao_Paulo",
+        );
+
+        const notificationIdentifier = await schedulePushNotification({
+          title: `Novo episódio de '${anime.title_english || anime.title}'`,
+          body: "Um novo episódio está disponível! Toque para assistir.",
+          trigger: {
+            date: convertedDate,
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+          },
+          data: {
+            animeId: anime.mal_id,
+          },
+        });
+
+        setAnimeNotifications((prev) => [
+          ...prev,
+          {
+            anime,
+            identifier: notificationIdentifier,
+          },
+        ]);
+
+        setRunNotifyAnimation(true);
+      }
+    } catch (error) {
+      console.error("Falha ao (des)agendar notificação:", error);
+      alert("Ocorreu um erro ao processar sua solicitação de notificação.");
+    } finally {
+      setIsNotifying(false);
     }
   };
 
@@ -130,7 +212,7 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
                     scale: 0.5,
                   }}
                   animate={{
-                    scale: runAnimation ? [1.3, 1.0] : 1.0,
+                    scale: runFavAnimation ? [1.3, 1.0] : 1.0,
                   }}
                   transition={{
                     type: "spring",
@@ -144,9 +226,44 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
                 </MotiView>
               </AnimatePresence>
             ) : (
-              <Feather name="heart" color={red.val} size={20} />
+              <Feather name="heart" color={textColor.val} size={20} />
             )}
           </AnimeFavoriteButton>
+
+          {anime.airing && (
+            <AnimeFavoriteButton
+              onPress={handleNotify}
+              disabled={isNotifying}
+              style={{
+                backgroundColor: shape.val,
+                opacity: isNotifying ? 0.7 : 1,
+              }}
+            >
+              {isNotifying ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : isNotify ? (
+                <MotiView
+                  key="moti-bell"
+                  from={{
+                    rotate: "0deg",
+                  }}
+                  animate={{
+                    rotate: runNotifyAnimation
+                      ? ["5deg", "-5deg", "0deg"]
+                      : "0deg",
+                  }}
+                  transition={{
+                    type: "spring",
+                    duration: 250,
+                  }}
+                >
+                  <FontAwesomeFreeSolid name="bell" color={"#fff"} size={20} />
+                </MotiView>
+              ) : (
+                <Feather name="bell-off" color={red.val} size={20} />
+              )}
+            </AnimeFavoriteButton>
+          )}
         </AnimeFavoriteButtonContainer>
         <AnimeSynopsisContainer>
           <Text

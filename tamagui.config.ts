@@ -7,6 +7,7 @@ const fredoka = createFont({
     1: 12,
     2: 16,
     3: 32,
+    4: 40,
   },
   lineHeight: {
     2: 22,

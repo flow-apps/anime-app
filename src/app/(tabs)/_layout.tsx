@@ -1,14 +1,44 @@
 import { RootState } from "@/redux/store";
-import { Fredoka_400Regular } from "@expo-google-fonts/fredoka";
 import Feather from "@react-native-vector-icons/feather";
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import { useSelector } from "react-redux";
 import { useTheme } from "tamagui";
+
+import * as Notifications from "expo-notifications";
+import { useEffect } from "react";
+
+function useNotificationObserver() {
+  useEffect(() => {
+    function redirect(notification: Notifications.Notification) {
+      const animeId = notification.request.content.data?.animeId;
+      if (animeId) {
+        router.push(`/anime/${animeId}`);
+      }
+    }
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        redirect(response.notification);
+      },
+    );
+
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (response) {
+        redirect(response.notification);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+}
 
 export default function TabLayout() {
   const { theme_name } = useSelector((state: RootState) => state.configs);
 
   const { shape, textColor } = useTheme();
+  useNotificationObserver();
 
   return (
     <Tabs

@@ -27,6 +27,7 @@ Notifications.setNotificationHandler({
     shouldShowList: true,
   }),
 });
+
 SplashScreen.preventAutoHideAsync();
 
 export default function StackLayout() {
@@ -60,14 +61,8 @@ export default function StackLayout() {
       },
     );
 
-    const responseListener =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
     return () => {
       notificationListener.remove();
-      responseListener.remove();
     };
   }, []);
 

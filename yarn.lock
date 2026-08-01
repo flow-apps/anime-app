@@ -3530,6 +3530,11 @@ csstype@^3.2.2:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz"
   integrity sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==
 
+dayjs@^1.11.21:
+  version "1.11.21"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.21.tgz#57f87562e62de76f3c704bd2b8d522fc33068eb2"
+  integrity sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==
+
 debug@2.6.9, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
@@ -3810,6 +3815,13 @@ expo-linking@~57.0.1:
     expo-constants "~57.0.2"
     invariant "^2.2.4"
 
+expo-localization@~57.0.1:
+  version "57.0.1"
+  resolved "https://registry.yarnpkg.com/expo-localization/-/expo-localization-57.0.1.tgz#62d7a99f5d548bcf01bfd36d2411b47f38db9c48"
+  integrity sha512-8Ffl4UTbOsQeGT0v5fxMbyPHyPMPnhSPDFQJa8p9rjJrthFoAtNi+fL6Ssmrvf1/7dmPq1mVY52MEt0TMEfgjA==
+  dependencies:
+    rtl-detect "^1.0.2"
+
 expo-manifests@~57.0.1:
   version "57.0.1"
   resolved "https://registry.npmjs.org/expo-manifests/-/expo-manifests-57.0.1.tgz"
@@ -3926,6 +3938,13 @@ expo-system-ui@~57.0.0:
   dependencies:
     "@react-native/normalize-colors" "0.86.0"
     debug "^4.3.2"
+
+expo-task-manager@~57.0.7:
+  version "57.0.7"
+  resolved "https://registry.yarnpkg.com/expo-task-manager/-/expo-task-manager-57.0.7.tgz#89f104a2778ad233cf3210f70aff2fb072d0f019"
+  integrity sha512-ePnBVrkntuxV0XPKhMlJoMyqMH4K3OGrUfqajf/3UzVjfTB2ARmR3ExtB996EAtrsAQ8fREvZrdhbBAnDSiRAg==
+  dependencies:
+    unimodules-app-loader "~57.0.1"
 
 expo-updates-interface@~57.0.1:
   version "57.0.1"
@@ -5718,6 +5737,11 @@ restore-cursor@^2.0.0:
     onetime "^2.0.0"
     signal-exit "^3.0.2"
 
+rtl-detect@^1.0.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/rtl-detect/-/rtl-detect-1.1.2.tgz#ca7f0330af5c6bb626c15675c642ba85ad6273c6"
+  integrity sha512-PGMBq03+TTG/p/cRB7HCLKJ1MgDIi07+QU1faSjiYRfmY5UsAttV9Hs08jDAHVwcOwmVLcSJkpwyfXszVjWfIQ==
+
 safe-buffer@5.1.2:
   version "5.1.2"
   resolved "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
@@ -6241,6 +6265,11 @@ unicorn-magic@^0.3.0:
   version "0.3.0"
   resolved "https://registry.npmjs.org/unicorn-magic/-/unicorn-magic-0.3.0.tgz"
   integrity sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==
+
+unimodules-app-loader@~57.0.1:
+  version "57.0.1"
+  resolved "https://registry.yarnpkg.com/unimodules-app-loader/-/unimodules-app-loader-57.0.1.tgz#3f9a98026cb379e36b95c146319c3a2cfe083a75"
+  integrity sha512-wey5ChoJkCTq0j0JWdIMu2QB81vVrdhmrNAP14ZZ6WDslnZ7ff7Ezv8rMdEnVHaCKz3xK4mIVXbVU51xHgdyCA==
 
 unpipe@~1.0.0:
   version "1.0.0"

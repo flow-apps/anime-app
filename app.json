@@ -10,7 +10,10 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.flowapps.AnimeApp"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-localization"
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
