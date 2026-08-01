@@ -5,6 +5,7 @@ export const Container = styled(View, {
   flex: 1,
   alignItems: "center",
   justifyContent: "center",
+  marginLeft: -15,
 });
 
 export const Slider = styled(ImageSlider, {});

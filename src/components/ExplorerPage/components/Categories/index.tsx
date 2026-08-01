@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import Loading from "@/components/Loading";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useTranslateText } from "@/hooks/useTranslateText";
+import { RootState } from "@/redux/store";
 import { api } from "@/services/api";
 import { GenreItem, GenreResponse } from "@/types/genre";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSelector } from "react-redux";
 import {
   Category,
   CategoryContainer,
@@ -46,9 +48,8 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
     Record<number, [string, string]>
   >({});
   const [visibleCount, setVisibleCount] = useState(6);
-  const [translate, setTranslate, updated] = usePersistedState<boolean>(
-    "translate_text",
-    false,
+  const { adult_content, translate_text } = useSelector(
+    (state: RootState) => state.configs,
   );
 
   const [categoriesCache, setCategoriesCache, updatedCategories] =
@@ -58,7 +59,7 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
 
   useEffect(() => {
     (async () => {
-      if (!updated || !updatedCategories) return;
+      if (!updatedCategories) return;
 
       let categoriesData: GenreItem[];
 
@@ -83,7 +84,7 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
         setCategoriesCache(sortedData);
       }
 
-      if (translate) {
+      if (translate_text) {
         const translatedGenres = await Promise.all(
           categoriesData.map(async (genre) => ({
             ...genre,
@@ -99,7 +100,7 @@ const Categories: React.FC<ICategoriesProps> = ({ onCategoryPress }) => {
       setGenreColors(createGenreColorMap(categoriesData));
       setLoading(false);
     })();
-  }, [updated, updatedCategories, translate, translateText]);
+  }, [translate_text, updatedCategories]);
 
   const visibleGenres = genres.slice(0, visibleCount);
   const hasMoreGenres = visibleCount < genres.length;

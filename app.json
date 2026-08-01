@@ -2,7 +2,7 @@
   "expo": {
     "name": "AnimeApp",
     "slug": "AnimeApp",
-    "version": "0.0.10",
+    "version": "10",
     "orientation": "portrait",
     "scheme": "animeapp",
     "userInterfaceStyle": "automatic",

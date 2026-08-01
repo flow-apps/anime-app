@@ -251,6 +251,7 @@ const ExplorerPage: React.FC = () => {
           placeholder="Pesquisar anime..."
           onSubmitEditing={() => handleSearch()}
           disabled={!!searchResults.length}
+          placeholderTextColor="$grey"
         />
         {!!searchResults.length && (
           <SearchButton onPress={handleClearSearch}>

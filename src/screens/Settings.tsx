@@ -60,7 +60,7 @@ const SettingsScreen: React.FC = () => {
           fontSize={16}
           marginVertical={10}
         >
-          Políticas de Privacidade
+          Política de Privacidade
         </SizableText>
       </TouchableOpacity>
     </Container>
