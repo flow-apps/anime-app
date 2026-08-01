@@ -46,10 +46,6 @@ export default function StackLayout() {
   >(undefined);
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(
-      (token) => token && setExpoPushToken(token),
-    );
-
     if (Platform.OS === "android") {
       Notifications.getNotificationChannelsAsync().then((value) =>
         setChannels(value ?? []),
@@ -100,6 +96,17 @@ export default function StackLayout() {
             target: "Portuguese",
             downloadIfNeeded: true,
           }),
+          registerForPushNotificationsAsync()
+            .then((token) => {
+              if (token) setExpoPushToken(token);
+              return token; // Ensure the promise resolves
+            })
+            .catch((e) => {
+              console.error(
+                "Failed to register for push notifications during prepare:",
+                e,
+              );
+            }),
         ]);
       } catch (e) {
         console.error("Failed to prepare translator", e);
