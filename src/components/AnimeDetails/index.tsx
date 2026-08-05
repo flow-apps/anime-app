@@ -7,6 +7,7 @@ import Feather from "@react-native-vector-icons/feather";
 import { FontAwesomeFreeSolid } from "@react-native-vector-icons/fontawesome-free-solid";
 import { useCalendars } from "expo-localization";
 import * as Notifications from "expo-notifications";
+import { useFocusEffect } from "expo-router";
 import { AnimatePresence, MotiView } from "moti";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
@@ -39,9 +40,12 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
     [],
   );
 
-  const [animesNotifications, setAnimeNotifications] = usePersistedState<
-    IAnimeNotification[]
-  >("anime_notifications", []);
+  const [
+    animesNotifications,
+    setAnimeNotifications,
+    ,
+    reloadAnimeNotifications,
+  ] = usePersistedState<IAnimeNotification[]>("anime_notifications", []);
 
   const [runFavAnimation, setRunFavAnimation] = useState(false);
   const [runNotifyAnimation, setRunNotifyAnimation] = useState(false);
@@ -88,6 +92,12 @@ const AnimeDetails: React.FC<IAnimeDetailsProps> = ({ anime }) => {
       return () => clearTimeout(timeout);
     }
   }, [runNotifyAnimation]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      reloadAnimeNotifications();
+    }, [reloadAnimeNotifications]),
+  );
 
   const { bg, red, shape, textColor } = useTheme();
 

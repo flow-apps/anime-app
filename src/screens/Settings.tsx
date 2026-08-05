@@ -59,7 +59,6 @@ const SettingsScreen: React.FC = () => {
     setIsClearNotificationsAlertVisible(false);
   };
 
-  // ... (restante do seu componente)
   return (
     <View style={{ flex: 1 }}>
       <Container style={{ padding: 10, paddingHorizontal: 25 }}>
@@ -91,7 +90,7 @@ const SettingsScreen: React.FC = () => {
             dispatch(setConfig({ configName: "adult_content", value: adult }));
           }}
         />
-        <TouchableOpacity onPress={handleClearNotifications}>
+        {/* <TouchableOpacity onPress={handleClearNotifications}>
           <SizableText
             color={"$red"}
             fontFamily="$body"
@@ -101,7 +100,7 @@ const SettingsScreen: React.FC = () => {
           >
             Limpar todas as notificações
           </SizableText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={handlePrivacy}>
           <SizableText
             color={"$textColor"}
@@ -132,7 +131,6 @@ const SettingsScreen: React.FC = () => {
             },
           ]}
         />
-        {/* Renderiza o CustomToast para cada toast ativo */}
       </Container>
       {currentToast && (
         <CustomToast
